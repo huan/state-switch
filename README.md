@@ -228,7 +228,7 @@ StateSwitch.setLog(log)
 
 Rename to `StateSwitch` because the name StateMonitor on npmjs.com is taken.
 
-1. Make it a solo NPM Module.
+1. Make it a solo NPM Module. ([#466](https://github.com/Chatie/wechaty/issues/466))
 
 ### 0.0.0 (Oct 2016)
 
