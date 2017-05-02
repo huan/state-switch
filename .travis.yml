@@ -1,0 +1,17 @@
+dist: trusty
+os:
+  - linux
+
+language: node_js
+node_js:
+  - '6'
+  - '7'
+
+before_deploy:
+  - npm version
+
+deploy:
+  provider: npm
+  email: zixia@zixia.net
+  api_key: "$NPM_TOKEN"
+  skip_cleanup: true

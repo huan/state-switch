@@ -1,6 +1,9 @@
 # state-switcher
 State Switcher is a Monitor/Guarder for Async Actions.
 
+[![npm version](https://badge.fury.io/js/state-switcher.svg)](https://badge.fury.io/js/state-switcher)
+[![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
+
 ## Example
 
 Talk is cheap, show me the code!
@@ -231,7 +234,7 @@ Rename to `StateSwitcher` because the name StateMonitor on npmjs.com is taken.
 
 Orignal name is `StateMonitor`
 
-1. Part of the Wechaty project
+1. Part of the [Wechaty](https://github.com/Chatie/wechaty) project
 
 Author
 ------
