@@ -1,0 +1,37 @@
+{
+  "name": "state-switcher",
+  "version": "0.1.0",
+  "description": "State Switcher is a Change Monitor/Guarder for Async Actions.",
+  "main": "dist/state-switcher.js",
+  "types": "dist/state-switcher.d.ts",
+  "scripts": {
+    "clean": "rm -fr dist/",
+    "demo": "ts-node example/demo",
+    "dist": "npm run clean && tsc",
+    "lint": "npm run tslint",
+    "tslint": "tslint src/*.ts && tsc --noEmit",
+    "test": "npm run lint && npm run dist && tap dist/*.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zixia/state-switcher.git"
+  },
+  "keywords": [
+    "state",
+    "switcher",
+    "monitor",
+    "async"
+  ],
+  "author": "Huan LI <zixia@zixia.net>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/zixia/state-switcher/issues"
+  },
+  "homepage": "https://github.com/zixia/state-switcher#readme",
+  "devDependencies": {
+    "tap": "^10.3.2",
+    "ts-node": "^3.0.2",
+    "tslint": "^5.1.0",
+    "typescript": "^2.3.2"
+  }
+}
