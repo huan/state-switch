@@ -2,7 +2,7 @@
  *
  * Wechaty: Wechat for Bot. and for human who talk to bot/robot
  *
- * Class StateSwitcher
+ * Class StateSwitch
  * Licenst: Apache-2.0
  * https://github.com/zixia/state-switcher
  *
@@ -13,7 +13,7 @@
  * A - State A
  * B - State B
  */
-export class StateSwitcher <A, B>{
+export class StateSwitch <A, B>{
   private _target:  A|B
   private _current: A|B
   private _stable:  boolean
@@ -30,7 +30,7 @@ export class StateSwitcher <A, B>{
     } else {
       this.setLog(null)
     }
-    this.log.silly('StateSwitcher', 'constructor(%s, %s)', _client, initState)
+    this.log.silly('StateSwitch', 'constructor(%s, %s)', _client, initState)
 
     this._target  = initState
     this._current = initState
@@ -54,14 +54,14 @@ export class StateSwitcher <A, B>{
    */
   public target(newState?: A|B): A|B {
     if (newState) {
-      this.log.verbose('StateSwitcher', '%s:target(%s) <- (%s)',
+      this.log.verbose('StateSwitch', '%s:target(%s) <- (%s)',
                                   this._client,
                                   newState,
                                   this._target,
       )
       this._target = newState
     } else {
-      this.log.silly('StateSwitcher', '%s:target() - %s', this._client, this._target)
+      this.log.silly('StateSwitch', '%s:target() - %s', this._client, this._target)
     }
     return this._target
   }
@@ -72,7 +72,7 @@ export class StateSwitcher <A, B>{
    */
   public current(newState?: A|B, stable = true): A|B {
     if (newState) {
-      this.log.verbose('StateSwitcher', '%s:current(%s,%s) <- (%s,%s)',
+      this.log.verbose('StateSwitch', '%s:current(%s,%s) <- (%s,%s)',
                                   this._client,
                                   newState, stable,
                                   this._current, this._stable,
@@ -82,13 +82,13 @@ export class StateSwitcher <A, B>{
        * strict check current is equal to target
        */
       if (this._target !== newState) {
-        this.log.warn('StateSwitcher', '%s:current(%s,%s) current is different with target. call state.target(%s) first.',
+        this.log.warn('StateSwitch', '%s:current(%s,%s) current is different with target. call state.target(%s) first.',
                                  this._client,
                                  newState, stable,
                                  newState,
         )
         const e = new Error('current not match target')
-        this.log.verbose('StateSwitcher', e.stack)
+        this.log.verbose('StateSwitch', e.stack)
         throw e
       }
 
@@ -98,18 +98,18 @@ export class StateSwitcher <A, B>{
       if (this._current === newState && this._stable === stable
           && stable === false
       ) {
-        this.log.warn('StateSwitcher', '%s:current(%s,%s) called but there are already in the same state',
+        this.log.warn('StateSwitch', '%s:current(%s,%s) called but there are already in the same state',
                                   this._client,
                                   newState, stable,
         )
         const e = new Error('current unchange')
-        this.log.verbose('StateSwitcher', e.stack)
+        this.log.verbose('StateSwitch', e.stack)
       }
 
       this._current = newState
       this._stable  = stable
     } else {
-      this.log.silly('StateSwitcher', '%s:current() - %s', this._client, this._current)
+      this.log.silly('StateSwitch', '%s:current() - %s', this._client, this._current)
     }
     return this._current
   }
@@ -118,7 +118,7 @@ export class StateSwitcher <A, B>{
    * does the current state be stable(not inprocess)?
    */
   public stable() {
-    this.log.silly('StateSwitcher', '%s:stable() is %s', this._client, this._stable)
+    this.log.silly('StateSwitch', '%s:stable() is %s', this._client, this._stable)
     return this._stable
   }
 
@@ -126,7 +126,7 @@ export class StateSwitcher <A, B>{
    * does the current state be inprocess(not stable)?
    */
   public inprocess() {
-    this.log.silly('StateSwitcher', '%s:inprocess() %s', this._client, !this._stable)
+    this.log.silly('StateSwitch', '%s:inprocess() %s', this._client, !this._stable)
     return !this._stable
   }
 
@@ -138,4 +138,4 @@ export class StateSwitcher <A, B>{
   }
 }
 
-export default StateSwitcher
+export default StateSwitch

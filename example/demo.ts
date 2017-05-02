@@ -1,4 +1,4 @@
-import { StateSwitcher } from '../'
+import { StateSwitch } from '../'
 
 function doSlowConnect() {
   console.log('doSlowConnect() start connecting')
@@ -21,7 +21,7 @@ function doSlowDisconnect() {
 }
 
 class MyConnection {
-  private state = new StateSwitcher<'connected', 'disconnected'>('MyConnection', 'disconnected')
+  private state = new StateSwitch<'connected', 'disconnected'>('MyConnection', 'disconnected')
 
   constructor() {
     /* */

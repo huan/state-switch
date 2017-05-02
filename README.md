@@ -1,8 +1,8 @@
-# state-switcher 
+# state-switch
 
-State Switcher is a Monitor/Guarder for Async Actions.
+State Switch is a Monitor/Guarder for Async Actions.
 
-[![Build Status](https://travis-ci.org/zixia/state-switcher.svg?branch=master)](https://travis-ci.org/zixia/state-switcher) [![npm version](https://badge.fury.io/js/state-switcher.svg)](https://badge.fury.io/js/state-switcher) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
+[![Build Status](https://travis-ci.org/zixia/state-switch.svg?branch=master)](https://travis-ci.org/zixia/state-switch) [![npm version](https://badge.fury.io/js/state-switch.svg)](https://badge.fury.io/js/state-switch) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
 
 ## Example
 
@@ -10,7 +10,7 @@ Talk is cheap, show me the code!
 
 ### Code
 ```ts
-import { StateSwitcher } from '../'
+import { StateSwitch } from '../'
 
 function doSlowConnect() {
   console.log('doSlowConnect() start connecting')
@@ -33,7 +33,7 @@ function doSlowDisconnect() {
 }
 
 class MyConnection {
-  private state = new StateSwitcher<'connected', 'disconnected'>('MyConnection', 'disconnected')
+  private state = new StateSwitch<'connected', 'disconnected'>('MyConnection', 'disconnected')
 
   constructor() {
     /* */
@@ -136,7 +136,7 @@ setTimeout(() => {
 ```shell
 $ npm run demo
 
-> state-switcher@0.0.1 demo /home/zixia/git/state-switcher
+> state-switch@0.1.3 demo /home/zixia/git/state-switch
 > ts-node example/demo
 
 CALL: conn.connect()
@@ -169,10 +169,10 @@ That's the idea: we have to know the state of our async operation.
 
 ## API Reference
 
-Class StateSwitcher<A, B>
+Class StateSwitch<A, B>
 
 ```ts
-private state = new StateSwitcher<'StateA', 'StateB'>
+private state = new StateSwitch<'StateA', 'StateB'>
 ```
 
 ### target(): A | B
@@ -219,14 +219,14 @@ Personaly I use Brolog, which is writen by my self, the same API with Npmlog but
 
 ```ts
 const log = Brolog.instance()
-stateSwitcher.setLog(log)
+StateSwitch.setLog(log)
 ```
 
 ## History
 
 ### 0.1.0 (May 2017)
 
-Rename to `StateSwitcher` because the name StateMonitor on npmjs.com is taken.
+Rename to `StateSwitch` because the name StateMonitor on npmjs.com is taken.
 
 1. Make it a solo NPM Module.
 

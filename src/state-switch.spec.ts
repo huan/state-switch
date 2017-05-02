@@ -2,11 +2,11 @@
 
 import { test } from 'tap'
 
-import StateSwitcher from './state-switcher'
+import StateSwitch from './state-switch'
 
-test('StateSwitcher target/current & stable', t => {
-  const CLIENT_NAME = 'StateSwitcherTest'
-  const sm = new StateSwitcher<'A', 'B'>(CLIENT_NAME, 'A')
+test('StateSwitch target/current & stable', t => {
+  const CLIENT_NAME = 'StateSwitchTest'
+  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
 
   t.is(sm.current(), 'A', 'current should be A')
   t.is(sm.target(), 'A', 'target should be A')
@@ -37,9 +37,9 @@ test('StateSwitcher target/current & stable', t => {
   t.end()
 })
 
-test('StateSwitcher client & stable/inprocess', t => {
-  const CLIENT_NAME = 'StateSwitcherTest'
-  const sm = new StateSwitcher<'A', 'B'>(CLIENT_NAME, 'A')
+test('StateSwitch client & stable/inprocess', t => {
+  const CLIENT_NAME = 'StateSwitchTest'
+  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
 
   t.is(sm.client(), CLIENT_NAME, 'should get the same client name as init')
 
@@ -60,8 +60,8 @@ test('StateSwitcher client & stable/inprocess', t => {
 })
 
 test('current() strict check with target', t => {
-  const CLIENT_NAME = 'StateSwitcherTest'
-  const sm = new StateSwitcher<'A', 'B'>(CLIENT_NAME, 'A')
+  const CLIENT_NAME = 'StateSwitchTest'
+  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
 
   t.throws(() => {
     sm.current('B')
