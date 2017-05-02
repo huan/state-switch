@@ -1,6 +1,6 @@
 {
   "name": "state-switcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "State Switcher is a Change Monitor/Guarder for Async Actions.",
   "main": "dist/state-switcher.js",
   "types": "dist/state-switcher.d.ts",
