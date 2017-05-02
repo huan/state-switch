@@ -1,6 +1,8 @@
-# state-switcher [![Build Status](https://travis-ci.org/zixia/state-switcher.svg?branch=master)](https://travis-ci.org/zixia/state-switcher) [![npm version](https://badge.fury.io/js/state-switcher.svg)](https://badge.fury.io/js/state-switcher) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
+# state-switcher 
 
 State Switcher is a Monitor/Guarder for Async Actions.
+
+[![Build Status](https://travis-ci.org/zixia/state-switcher.svg?branch=master)](https://travis-ci.org/zixia/state-switcher) [![npm version](https://badge.fury.io/js/state-switcher.svg)](https://badge.fury.io/js/state-switcher) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
 
 ## Example
 
