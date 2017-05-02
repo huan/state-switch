@@ -171,8 +171,17 @@ That's the idea: we have to know the state of our async operation.
 
 Class StateSwitch<A, B>
 
+### constructor(clientName: string, initState: A | B)
+
+Inorder to create a new StateSwitch instance, you need to define:
+
+1. name of state A, ie: `open`
+1. name of state B, ie: `close`
+1. who is under management: clientName, ie: `MyConn`
+1. the initial state, ie: 'close'
+
 ```ts
-private state = new StateSwitch<'StateA', 'StateB'>
+private state = new StateSwitch<'open', 'close'>('MyConn', 'close')
 ```
 
 ### target(): A | B
