@@ -15,27 +15,27 @@ Talk is cheap, show me the code!
 import { StateSwitch } from '../'
 
 function doSlowConnect() {
-  console.log('doSlowConnect() start connecting')
+  console.log('> doSlowConnect() started')
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      console.log('doSlowConnect() connected')
+      console.log('> doSlowConnect() done')
       resolve()
     }, 1000)
   })
 }
 
 function doSlowDisconnect() {
-  console.log('doSlowDisconnect() start disconnecting')
+  console.log('> doSlowDisconnect() started')
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      console.log('doSlowDisconnect() disconnected')
+      console.log('> doSlowDisconnect() done')
       resolve()
     }, 1000)
   })
 }
 
 class MyConnection {
-  private state = new StateSwitch<'connected', 'disconnected'>('MyConnection', 'disconnected')
+  private state = new StateSwitch<'open', 'close'>('MyConnection', 'close')
 
   constructor() {
     /* */
@@ -43,89 +43,93 @@ class MyConnection {
 
   public connect() {
     /**
-     * This is the right state
+     * This is the only 1 Right State
      */
-    if (this.state.target() === 'disconnected' && this.state.stable()) {
-      this.state.target('connected')
-      this.state.current('connected', false)
+    if (this.state.target() === 'close' && this.state.stable()) {
+      this.state.target('open')
+      this.state.current('open', false)
 
       doSlowConnect().then(() => {
-        this.state.current('connected', true)
-        console.log(`I have just connected.`)
+        this.state.current('open', true)
+        console.log(`> I'm now opened`)
       })
 
-      console.log(`I'm connecting now`)
+      console.log(`> I'm opening`)
       return
     }
 
     /**
-     * Error state
+     * These are the other 3 Error States
      */
-    if (this.state.target() === 'disconnected' && this.state.inprocess()) {
-      console.error(`I'm disconnecting, please wait`)
-    } else if (this.state.target() === 'connected' && this.state.stable()) {
-      console.error(`I'm already connected. no need to connect again`)
-    } else if (this.state.target() === 'connected' && this.state.inprocess()) {
-      console.error(`I'm connecting, please wait`)
+    if (this.state.target() === 'close' && this.state.inprocess()) {
+      console.error(`> I'm closing, please wait`)
+    } else if (this.state.target() === 'open' && this.state.stable()) {
+      console.error(`> I'm already open. no need to connect again`)
+    } else if (this.state.target() === 'open' && this.state.inprocess()) {
+      console.error(`> I'm opening, please wait`)
     }
   }
 
   public disconnect() {
     /**
-     * This is the right state
+     * This is the only one Right State
      */
-    if (this.state.target() === 'connected' && this.state.stable()) {
-      this.state.target('disconnected')
-      this.state.current('disconnected', false)
+    if (this.state.target() === 'open' && this.state.stable()) {
+      this.state.target('close')
+      this.state.current('close', false)
 
       doSlowDisconnect().then(() => {
-        this.state.current('disconnected', true)
-        console.log(`I have just disconnected.`)
+        this.state.current('close', true)
+        console.log(`> I'm closed.`)
       })
 
-      console.log(`I'm disconnecting now`)
+      console.log(`> I'm closing`)
       return
     }
 
     /**
-     * Error state
+     * These are the other 3 Error States
      */
-    if (this.state.target() === 'connected' && this.state.inprocess()) {
-      console.error(`I'm connecting, please wait`)
-    } else if (this.state.target() === 'disconnected' && this.state.stable()) {
-      console.error(`I'm already disconnected. no need to disconnect again`)
-    } else if (this.state.target() === 'disconnected' && this.state.inprocess()) {
-      console.error(`I'm disconnecting, please wait`)
+    if (this.state.target() === 'open' && this.state.inprocess()) {
+      console.error(`> I'm opening, please wait`)
+    } else if (this.state.target() === 'close' && this.state.stable()) {
+      console.error(`> I'm already close. no need to disconnect again`)
+    } else if (this.state.target() === 'close' && this.state.inprocess()) {
+      console.error(`> I'm closing, please wait`)
     }
   }
 }
 
 const conn = new MyConnection()
 
-console.log('CALL: conn.connect()')
+console.log('CALL: conn.connect(): should start to opening')
 conn.connect()
 
-console.log('CALL: conn.connect()')
+console.log('CALL: conn.connect(): should not connect again while opening')
 conn.connect()
 
-console.log('CALL: conn.disconnect()')
+console.log('CALL: conn.disconnect(): can not disconnect while opening')
 conn.disconnect()
 
 setTimeout(() => {
-  console.log('CALL: conn.connect()')
+  console.log('... 2 seconds later, should be already open  ...')
+
+  console.log('CALL: conn.connect(): should not connect again if we are open')
   conn.connect()
 
-  console.log('CALL: conn.disconnect()')
+  console.log('CALL: conn.disconnect(): should start to closing')
   conn.disconnect()
 
-  console.log('CALL: conn.disconnect()')
+  console.log('CALL: conn.disconnect(): should not disconnect again while we are closing')
   conn.disconnect()
 
-  console.log('CALL: conn.connect()')
+  console.log('CALL: conn.connect(): can not do connect while we are closing')
   conn.connect()
 
   setTimeout(() => {
-    console.log('CALL: conn.disconnect()')
+    console.log('... 2 seconds later, should be already closed ...')
+
+    console.log('CALL: conn.disconnect(): should not disconnect again if we are close')
     conn.disconnect()
   }, 2000)
 
@@ -141,33 +145,34 @@ $ npm run demo
 > state-switch@0.1.3 demo /home/zixia/git/state-switch
 > ts-node example/demo
 
-CALL: conn.connect()
-doSlowConnect() start connecting
-I'm connecting now
-CALL: conn.connect()
-I'm connecting, please wait
-CALL: conn.disconnect()
-I'm connecting, please wait
-doSlowConnect() connected
-I have just connected.
-CALL: conn.connect()
-I'm already connected. no need to connect again
-CALL: conn.disconnect()
-doSlowDisconnect() start disconnecting
-I'm disconnecting now
-CALL: conn.disconnect()
-I'm disconnecting, please wait
-CALL: conn.connect()
-I'm disconnecting, please wait
-doSlowDisconnect() disconnected
-I have just disconnected.
-CALL: conn.disconnect()
-I'm already disconnected. no need to disconnect again
+CALL: conn.connect(): should start to opening
+> doSlowConnect() started
+> I'm opening
+CALL: conn.connect(): should not connect again while opening
+> I'm opening, please wait
+CALL: conn.disconnect(): can not disconnect while opening
+> I'm opening, please wait
+> doSlowConnect() done
+> I'm now opened
+... 2 seconds later, should be already open  ...
+CALL: conn.connect(): should not connect again if we are open
+> I'm already open. no need to connect again
+CALL: conn.disconnect(): should start to closing
+> doSlowDisconnect() started
+> I'm closing
+CALL: conn.disconnect(): should not disconnect again while we are closing
+> I'm closing, please wait
+CALL: conn.connect(): can not do connect while we are closing
+> I'm closing, please wait
+> doSlowDisconnect() done
+> I'm closed.
+... 2 seconds later, should be already closed ...
+CALL: conn.disconnect(): should not disconnect again if we are close
+> I'm already close. no need to disconnect again
 
 ```
 
-That's the idea: we have to know the state of our async operation.
-
+That's the idea: **we should always be able to know the state of our async operation**.
 
 ## API Reference
 
@@ -175,7 +180,7 @@ Class StateSwitch<A, B>
 
 ### constructor(clientName: string, initState: A | B)
 
-Inorder to create a new StateSwitch instance, you need to define:
+In order to create a new StateSwitch instance, you need to define:
 
 1. name of state A, ie: `open`
 1. name of state B, ie: `close`
@@ -192,7 +197,7 @@ Get target `state`
 
 ### target(newState): A | B
 
-Set target `state` `newState`
+Set target `state` to `newState`
 
 ### current(): A | B
 
