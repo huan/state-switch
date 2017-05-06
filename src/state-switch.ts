@@ -61,7 +61,7 @@ export class StateSwitch <A, B>{
       )
       this._target = newState
     } else {
-      this.log.silly('StateSwitch', '%s:target() - %s', this._client, this._target)
+      this.log.silly('StateSwitch', '%s:target() is %s', this._client, this._target)
     }
     return this._target
   }
@@ -109,7 +109,7 @@ export class StateSwitch <A, B>{
       this._current = newState
       this._stable  = stable
     } else {
-      this.log.silly('StateSwitch', '%s:current() - %s', this._client, this._current)
+      this.log.silly('StateSwitch', '%s:current() is %s', this._client, this._current)
     }
     return this._current
   }
@@ -126,7 +126,7 @@ export class StateSwitch <A, B>{
    * does the current state be inprocess(not stable)?
    */
   public inprocess() {
-    this.log.silly('StateSwitch', '%s:inprocess() %s', this._client, !this._stable)
+    this.log.silly('StateSwitch', '%s:inprocess() is %s', this._client, !this._stable)
     return !this._stable
   }
 
