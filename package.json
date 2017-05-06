@@ -9,7 +9,7 @@
     "demo": "ts-node example/demo",
     "dist": "npm run clean && tsc",
     "lint": "npm run tslint",
-    "tslint": "tslint src/*.ts && tsc --noEmit",
+    "tslint": "tslint --project tsconfig.json --type-check src/*.ts && tsc --noEmit",
     "test": "npm run lint && npm run dist && tap dist/*.spec.js"
   },
   "repository": {
