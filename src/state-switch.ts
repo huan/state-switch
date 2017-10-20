@@ -13,7 +13,7 @@
  * A - State A
  * B - State B
  */
-export class StateSwitch <A = 'on', B = 'off'>{
+export class StateSwitch <A = 'on', B = 'off'> {
   private _target:  A|B
   private _current: A|B
   private _stable:  boolean
