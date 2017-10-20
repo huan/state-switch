@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "dist/state-switch.js",
   "types": "dist/state-switch.d.ts",
