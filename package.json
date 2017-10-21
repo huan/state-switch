@@ -38,6 +38,7 @@
     "LICENSE",
     "README.md",
     "package.json",
-    "dist/"
+    "dist/",
+    "src/"
   ]
 }
