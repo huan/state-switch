@@ -12,7 +12,7 @@ Talk is cheap, show me the code!
 
 ### Code
 ```ts
-import { StateSwitch } from '../'
+import { StateSwitch } from '../src/state-switch'
 
 function doSlowConnect() {
   console.log('> doSlowConnect() started')
@@ -35,7 +35,7 @@ function doSlowDisconnect() {
 }
 
 class MyConnection {
-  private state = new StateSwitch<'open', 'close'>('MyConnection', 'close')
+  private state = new StateSwitch('MyConnection')
 
   constructor() {
     /* */
@@ -45,12 +45,11 @@ class MyConnection {
     /**
      * This is the only 1 Right State
      */
-    if (this.state.target() === 'close' && this.state.stable()) {
-      this.state.target('open')
-      this.state.current('open', false)
+    if (this.state.off() === true) {
+      this.state.on('pending')
 
       doSlowConnect().then(() => {
-        this.state.current('open', true)
+        this.state.on(true)
         console.log(`> I'm now opened`)
       })
 
@@ -61,11 +60,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.target() === 'close' && this.state.inprocess()) {
+    if (this.state.off() === 'pending') {
       console.error(`> I'm closing, please wait`)
-    } else if (this.state.target() === 'open' && this.state.stable()) {
+    } else if (this.state.on() === true) {
       console.error(`> I'm already open. no need to connect again`)
-    } else if (this.state.target() === 'open' && this.state.inprocess()) {
+    } else if (this.state.on() === 'pending') {
       console.error(`> I'm opening, please wait`)
     }
   }
@@ -74,12 +73,11 @@ class MyConnection {
     /**
      * This is the only one Right State
      */
-    if (this.state.target() === 'open' && this.state.stable()) {
-      this.state.target('close')
-      this.state.current('close', false)
+    if (this.state.on() === true) {
+      this.state.off('pending')
 
       doSlowDisconnect().then(() => {
-        this.state.current('close', true)
+        this.state.off(true)
         console.log(`> I'm closed.`)
       })
 
@@ -90,11 +88,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.target() === 'open' && this.state.inprocess()) {
+    if (this.state.on() === 'pending') {
       console.error(`> I'm opening, please wait`)
-    } else if (this.state.target() === 'close' && this.state.stable()) {
+    } else if (this.state.off() === true) {
       console.error(`> I'm already close. no need to disconnect again`)
-    } else if (this.state.target() === 'close' && this.state.inprocess()) {
+    } else if (this.state.off() === 'pending') {
       console.error(`> I'm closing, please wait`)
     }
   }
@@ -176,56 +174,42 @@ That's the idea: **we should always be able to know the state of our async opera
 
 ## API Reference
 
-Class StateSwitch<A, B>
+Class StateSwitch
 
-### constructor(clientName: string, initState: A | B)
+### constructor(clientName?: string)
 
-In order to create a new StateSwitch instance, you need to define:
-
-1. name of state A, ie: `open`
-1. name of state B, ie: `close`
-1. who is under management: clientName, ie: `MyConn`
-1. the initial state, ie: 'close'
+Create a new StateSwitch instance.
 
 ```ts
-private state = new StateSwitch<'open', 'close'>('MyConn', 'close')
+private state = new StateSwitch('MyConn')
 ```
 
-### target(): A | B
+### on(): boolean | 'pending'
 
-Get target `state`
+Get the state for `ON`: `true` for ON(stable), `pending` for ON(in-process). `false` for not ON.
 
-### target(newState): A | B
+### on(state: true | 'pending'): void
 
-Set target `state` to `newState`
+Set the state for `ON`: `true` for ON(stable), `pending` for ON(in-process).
 
-### current(): A | B
+### off(): boolean | 'pending'
 
-Get current `state`
+Get the state for `OFF`: `true` for OFF(stable), `pending` for OFF(in-process). `false` for not OFF.
 
-### current(newState: A|B, stable: boolean = true): A | B
+### off(state: true | 'pending'): void
 
-Set current `state` to newState
+Set the state for `OFF`: `true` for OFF(stable), `pending` for OFF(in-process).
 
-if `stable` set to true, which is the default, that means there's no async operations on the fly.
-if `stable` set to false, means we are waiting some async operations.
+### pending(): boolean
 
-### stable(): boolean
+Check if the state is `pending`.
 
-Check if the state is `stable`.
+`true` means there's some async operations we need to wait.
+`false` means no async on fly.
 
-`true` means no async on fly.
-`false` means there's some async operations we need to wait.
+### name(): string
 
-### inprocess(): boolean
-
-Check for the opposite side of `stable()`.
-
-Return `!stable()`
-
-### client(): string
-
-Get the `client` name.
+Get the name from the constructor.
 
 ### setLog(log: Brolog | Npmlog)
 
@@ -239,6 +223,13 @@ StateSwitch.setLog(log)
 ```
 
 ## History
+
+### v0.2 (Oct 2017)
+
+BREAKING CHANGES: redesigned all APIs.
+
+1. delete all old APIs.
+1. add 4 new APIs: on() / off() / pending() / name()
 
 ### v0.1.0 (May 2017)
 

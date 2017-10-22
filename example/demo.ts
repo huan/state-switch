@@ -1,4 +1,4 @@
-import { StateSwitch } from '../'
+import { StateSwitch } from '../src/state-switch'
 
 function doSlowConnect() {
   console.log('> doSlowConnect() started')
@@ -21,7 +21,7 @@ function doSlowDisconnect() {
 }
 
 class MyConnection {
-  private state = new StateSwitch<'open', 'close'>('MyConnection', 'close')
+  private state = new StateSwitch('MyConnection')
 
   constructor() {
     /* */
@@ -31,12 +31,11 @@ class MyConnection {
     /**
      * This is the only 1 Right State
      */
-    if (this.state.target() === 'close' && this.state.stable()) {
-      this.state.target('open')
-      this.state.current('open', false)
+    if (this.state.off() === true) {
+      this.state.on('pending')
 
       doSlowConnect().then(() => {
-        this.state.current('open', true)
+        this.state.on(true)
         console.log(`> I'm now opened`)
       })
 
@@ -47,11 +46,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.target() === 'close' && this.state.inprocess()) {
+    if (this.state.off() === 'pending') {
       console.error(`> I'm closing, please wait`)
-    } else if (this.state.target() === 'open' && this.state.stable()) {
+    } else if (this.state.on() === true) {
       console.error(`> I'm already open. no need to connect again`)
-    } else if (this.state.target() === 'open' && this.state.inprocess()) {
+    } else if (this.state.on() === 'pending') {
       console.error(`> I'm opening, please wait`)
     }
   }
@@ -60,12 +59,11 @@ class MyConnection {
     /**
      * This is the only one Right State
      */
-    if (this.state.target() === 'open' && this.state.stable()) {
-      this.state.target('close')
-      this.state.current('close', false)
+    if (this.state.on() === true) {
+      this.state.off('pending')
 
       doSlowDisconnect().then(() => {
-        this.state.current('close', true)
+        this.state.off(true)
         console.log(`> I'm closed.`)
       })
 
@@ -76,11 +74,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.target() === 'open' && this.state.inprocess()) {
+    if (this.state.on() === 'pending') {
       console.error(`> I'm opening, please wait`)
-    } else if (this.state.target() === 'close' && this.state.stable()) {
+    } else if (this.state.off() === true) {
       console.error(`> I'm already close. no need to disconnect again`)
-    } else if (this.state.target() === 'close' && this.state.inprocess()) {
+    } else if (this.state.off() === 'pending') {
       console.error(`> I'm closing, please wait`)
     }
   }
