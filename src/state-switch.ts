@@ -9,20 +9,17 @@
  * Helper Class for Manage State Change
  */
 
-/**
- * A - State A
- * B - State B
- */
-export class StateSwitch <A = 'on', B = 'off'> {
-  private _target:  A|B
-  private _current: A|B
-  private _stable:  boolean
+ // 'pending': it's in process, not stable.
+ export type Pending = 'pending'
+
+export class StateSwitch {
+  private _on     : boolean
+  private _pending: boolean
 
   private log: any
 
   constructor(
-    private _client: string,
-    initState: A|B,
+    private _name = 'Lock',
     logInstance?: any,
   ) {
     if (logInstance) {
@@ -30,11 +27,10 @@ export class StateSwitch <A = 'on', B = 'off'> {
     } else {
       this.setLog(null)
     }
-    this.log.silly('StateSwitch', 'constructor(%s, %s)', _client, initState)
+    this.log.silly('StateSwitch', 'constructor(%s)', _name)
 
-    this._target  = initState
-    this._current = initState
-    this._stable  = true
+    this._on  = false
+    this._pending = false
   }
 
   public setLog(logInstance?: any) {
@@ -49,92 +45,74 @@ export class StateSwitch <A = 'on', B = 'off'> {
       }
     }
   }
+
+  public on()                     : boolean | Pending
+  public on(state: true | Pending): void
+  public on(state: never)         : never
   /**
-   * set/get target state
+   * set/get ON state
    */
-  public target(newState?: A|B): A|B {
-    if (newState) {
-      this.log.verbose('StateSwitch', '%s:target(%s) <- (%s)',
-                                  this._client,
-                                  newState,
-                                  this._target,
-      )
-      this._target = newState
-    } else {
-      this.log.silly('StateSwitch', '%s:target() is %s', this._client, this._target)
+  public on(state?: true | Pending): boolean | Pending | void {
+    if (state) {
+      this.log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
+                                  this._name,
+                                  state,
+                                  this.on(),
+                      )
+
+      this._on = true
+      this._pending = (state === 'pending')
+
+      return
     }
-    return this._target
+
+    const on = this._on
+                ? this._pending ? 'pending' : true
+                : false
+    this.log.silly('StateSwitch', '<%s> on() is %s', this._name, on)
+    return on
   }
 
+  public off()                     : boolean | Pending
+  public off(state: true | Pending): void
+  public off(state: never)         : never
+
   /**
-   * set/get current state
-   * @param stable boolean  true for stable, false for inprocess
+   * set/get OFF state
    */
-  public current(newState?: A|B, stable = true): A|B {
-    if (newState) {
-      this.log.verbose('StateSwitch', '%s:current(%s,%s) <- (%s,%s)',
-                                  this._client,
-                                  newState, stable,
-                                  this._current, this._stable,
-                )
+  public off(state?: true | Pending): boolean | Pending | void {
+    if (state) {
+      this.log.verbose('StateSwitch', '<%s> off(%s) <- (%s)',
+                                  this._name,
+                                  state,
+                                  this.off(),
+                      )
+      this._on      = false
+      this._pending = (state === 'pending')
 
-      /**
-       * strict check current is equal to target
-       */
-      if (this._target !== newState) {
-        this.log.warn('StateSwitch', '%s:current(%s,%s) current is different with target. call state.target(%s) first.',
-                                 this._client,
-                                 newState, stable,
-                                 newState,
-        )
-        const e = new Error('current not match target')
-        this.log.verbose('StateSwitch', e.stack)
-        throw e
-      }
-
-      /**
-       * warn for inprocess current state change twice, mostly like a logic bug outside
-       */
-      if (this._current === newState && this._stable === stable
-          && stable === false
-      ) {
-        this.log.warn('StateSwitch', '%s:current(%s,%s) called but there are already in the same state',
-                                  this._client,
-                                  newState, stable,
-        )
-        const e = new Error('current unchange')
-        this.log.verbose('StateSwitch', e.stack)
-      }
-
-      this._current = newState
-      this._stable  = stable
-    } else {
-      this.log.silly('StateSwitch', '%s:current() is %s', this._client, this._current)
+      return
     }
-    return this._current
+
+    const off = !this._on
+                ? this._pending ? 'pending' : true
+                : false
+    this.log.silly('StateSwitch', '<%s> off() is %s', this._name, off)
+    return off
   }
 
   /**
-   * does the current state be stable(not inprocess)?
+   * does the state is not stable(in process)?
    */
-  public stable() {
-    this.log.silly('StateSwitch', '%s:stable() is %s', this._client, this._stable)
-    return this._stable
-  }
-
-  /**
-   * does the current state be inprocess(not stable)?
-   */
-  public inprocess() {
-    this.log.silly('StateSwitch', '%s:inprocess() is %s', this._client, !this._stable)
-    return !this._stable
+  public pending() {
+    this.log.silly('StateSwitch', '<%s> pending() is %s', this._name, this._pending)
+    return this._pending
   }
 
   /**
    * get the client name
    */
-  public client() {
-    return this._client
+  public name() {
+    return this._name
   }
 }
 

@@ -1,74 +1,61 @@
 #!/usr/bin/env ts-node
 
-import { test } from 'tap'
+// tslint:disable:no-shadowed-variable
+import * as test  from 'blue-tape'
 
 import StateSwitch from './state-switch'
 
-test('StateSwitch target/current & stable', t => {
-  const CLIENT_NAME = 'StateSwitchTest'
-  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
+test('on()', async t => {
+  const ss = new StateSwitch()
 
-  t.is(sm.current(), 'A', 'current should be A')
-  t.is(sm.target(), 'A', 'target should be A')
-  t.true(sm.stable(), 'should be stable')
+  t.notOk(ss.on(), 'default is not on')
 
-  t.throws(() => {
-    sm.current('B')
-  }, Error, 'should throw if current not match target')
-  t.throws(() => {
-    sm.current('B', false)
-  }, Error, 'should throw if current not match target 2')
-  t.is(sm.current(), 'A', 'current should still be A')
-  t.is(sm.target(), 'A', 'target should still be A')
-  t.true(sm.stable(), 'should be stable')
+  ss.on('pending')
+  t.equal(ss.on(), 'pending', 'should be state pending')
 
-  sm.target('B')
-  sm.current('B')
-  t.is(sm.target(), 'B', 'target should still be B')
-  t.is(sm.current(), 'B', 'current should be B')
-  t.true(sm.stable(), 'should be stable')
+  ss.on(true)
+  t.equal(ss.on(), true, 'should be state true')
+  t.notOk(ss.off(), 'should not off')
 
-  sm.target('A')
-  sm.current('A', false)
-  t.is(sm.target(), 'A', 'target should still be A')
-  t.is(sm.current(), 'A', 'current should be A')
-  t.false(sm.stable(), 'should not be stable')
-
-  t.end()
+  ss.off(true)
+  t.notOk(ss.on(), 'should not ON after off()')
 })
 
-test('StateSwitch client & stable/inprocess', t => {
-  const CLIENT_NAME = 'StateSwitchTest'
-  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
+test('off()', async t => {
+  const ss = new StateSwitch()
 
-  t.is(sm.client(), CLIENT_NAME, 'should get the same client name as init')
+  t.ok(ss.off(), 'default is off')
+  t.equal(ss.off(), true, 'should in state true')
 
-  sm.target('B')
-  sm.current('B')
-  t.true(sm.stable(), 'should be stable')
-  t.false(sm.inprocess(), 'should be not inprocess')
+  ss.off('pending')
+  t.equal(ss.off(), 'pending', 'should be state pending')
 
-  sm.current('B', false)
-  t.false(sm.stable(), 'should not be stable')
-  t.true(sm.inprocess(), 'should be inprocess')
+  ss.off(true)
+  t.equal(ss.off(), true, 'should be state true')
+  t.notOk(ss.on(), 'should not on')
 
-  sm.current('B', true)
-  t.true(sm.stable(), 'should be stable')
-  t.false(sm.inprocess(), 'should be not inprocess')
-
-  t.end()
+  ss.on(true)
+  t.notOk(ss.off(), 'should not OFF after on()')
 })
 
-test('current() strict check with target', t => {
+test('pending()', async t => {
+  const ss = new StateSwitch()
+
+  t.notOk(ss.pending(), 'default is not pending')
+
+  ss.on('pending')
+  t.ok(ss.pending(), 'should in pending state')
+
+  ss.on(true)
+  t.notOk(ss.pending(), 'should not in pending state')
+
+  ss.off('pending')
+  t.ok(ss.pending(), 'should in pending state')
+})
+
+test('name', async t => {
   const CLIENT_NAME = 'StateSwitchTest'
-  const sm = new StateSwitch<'A', 'B'>(CLIENT_NAME, 'A')
+  const ss = new StateSwitch(CLIENT_NAME)
 
-  t.throws(() => {
-    sm.current('B')
-  }, Error, 'should thorw for unmatch current & target')
-
-  sm.target('B')
-  t.doesNotThrow(() => sm.current('B'), 'should not throws for matched current & target')
-
-  t.end()
+  t.is(ss.name(), CLIENT_NAME, 'should get the same client name as init')
 })
