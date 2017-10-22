@@ -9,6 +9,8 @@ node_js:
 
 before_deploy:
   - npm version
+  - npm run dist
+  - npm run test:npm
 
 deploy:
   provider: npm
