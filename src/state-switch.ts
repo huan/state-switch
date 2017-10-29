@@ -8,9 +8,11 @@
  *
  * Helper Class for Manage State Change
  */
+import { version }  from '../package.json'
+export const VERSION = version
 
- // 'pending': it's in process, not stable.
- export type Pending = 'pending'
+// 'pending': it's in process, not stable.
+export type Pending = 'pending'
 
 export class StateSwitch {
   private _on     : boolean
@@ -31,6 +33,10 @@ export class StateSwitch {
 
     this._on  = false
     this._pending = false
+  }
+
+  public version(): string {
+    return VERSION
   }
 
   public setLog(logInstance?: any) {

@@ -36,7 +36,8 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-dist/
+/dist/
+/bundles/
 /package-lock.json
 /state-switch-*.*.*.tgz
 

@@ -59,3 +59,9 @@ test('name', async t => {
 
   t.is(ss.name(), CLIENT_NAME, 'should get the same client name as init')
 })
+
+test('version()', t => {
+  const ss = new StateSwitch()
+  t.ok(ss.version(), 'should get version')
+  t.end()
+})
