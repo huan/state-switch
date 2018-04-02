@@ -207,6 +207,10 @@ Check if the state is `pending`.
 `true` means there's some async operations we need to wait.
 `false` means no async on fly.
 
+### ready(expectedState, crossWait=false): Promise<void>
+
+Wait the expected state to be ready.
+
 ### name(): string
 
 Get the name from the constructor.
@@ -223,6 +227,10 @@ StateSwitch.setLog(log)
 ```
 
 ## History
+
+### v0.3 (Apr 2018)
+
+1. add new method `ready()` to let user wait until the expected state is on(true).
 
 ### v0.2 (Oct 2017)
 

@@ -8,6 +8,8 @@
  *
  * Helper Class for Manage State Change
  */
+const NOP = require('nop')
+
 import { version }  from '../package.json'
 export const VERSION = version
 
@@ -19,6 +21,12 @@ export class StateSwitch {
   private _pending: boolean
 
   private log: any
+
+  private onPromise:    Promise<void>
+  private offPromise:   Promise<void>
+
+  private onResolver:   Function
+  private offResolver:  Function
 
   constructor(
     private _name = 'Lock',
@@ -33,6 +41,16 @@ export class StateSwitch {
 
     this._on  = false
     this._pending = false
+
+    /**
+     * for ready()
+     */
+    this.offPromise = Promise.resolve()
+    this.onPromise  = new Promise(r => {
+      this.onResolver = r
+    })
+    this.offResolver = NOP
+
   }
 
   public version(): string {
@@ -61,13 +79,24 @@ export class StateSwitch {
   public on(state?: true | Pending): boolean | Pending | void {
     if (state) {
       this.log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
-                                  this._name,
-                                  state,
-                                  this.on(),
+                                      this._name,
+                                      state,
+                                      this.on(),
                       )
 
       this._on = true
       this._pending = (state === 'pending')
+
+      /**
+       * for ready()
+       */
+      if (this.offResolver === NOP) {
+        this.offPromise = new Promise(r => this.offResolver = r)
+      }
+      if (state === true && this.onResolver !== NOP) {
+        this.onResolver()
+        this.onResolver = NOP
+      }
 
       return
     }
@@ -96,6 +125,17 @@ export class StateSwitch {
       this._on      = false
       this._pending = (state === 'pending')
 
+      /**
+       * for ready()
+       */
+      if (this.onResolver === NOP) {
+        this.onPromise = new Promise(r => this.onResolver = r)
+      }
+      if (state === true && this.offResolver !== NOP) {
+        this.offResolver()
+        this.offResolver = NOP
+      }
+
       return
     }
 
@@ -104,6 +144,25 @@ export class StateSwitch {
                 : false
     this.log.silly('StateSwitch', '<%s> off() is %s', this._name, off)
     return off
+  }
+
+  public async ready(
+    state: 'on' | 'off',
+    crossWait = false,
+  ): Promise<void> {
+    this.log.verbose('StateSwitch', 'ready(%s, %s)', state, crossWait)
+
+    if (state === 'on') {
+      if (this._on === false && crossWait !== true) {
+        throw new Error(`ready(on) but the state is off. call ready(on, true) to force crossWait`)
+      }
+      await this.onPromise
+    } else {  // off
+      if (this._on === true && crossWait !== true) {
+        throw new Error('ready(off) but the state is on. call ready(off, true) to force crossWait')
+      }
+      await this.offPromise
+    }
   }
 
   /**
