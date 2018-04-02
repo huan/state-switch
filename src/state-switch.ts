@@ -147,8 +147,8 @@ export class StateSwitch {
   }
 
   public async ready(
-    state: 'on' | 'off',
-    crossWait = false,
+    state: 'on' | 'off' = 'on',
+    crossWait           = false,
   ): Promise<void> {
     this.log.verbose('StateSwitch', 'ready(%s, %s)', state, crossWait)
 
