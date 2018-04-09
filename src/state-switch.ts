@@ -46,7 +46,7 @@ export class StateSwitch {
      * for ready()
      */
     this.offPromise = Promise.resolve()
-    this.onPromise  = new Promise(r => {
+    this.onPromise  = new Promise<void>(r => {
       this.onResolver = r
     })
     this.offResolver = NOP
@@ -91,7 +91,7 @@ export class StateSwitch {
        * for ready()
        */
       if (this.offResolver === NOP) {
-        this.offPromise = new Promise(r => this.offResolver = r)
+        this.offPromise = new Promise<void>(r => this.offResolver = r)
       }
       if (state === true && this.onResolver !== NOP) {
         this.onResolver()
@@ -129,7 +129,7 @@ export class StateSwitch {
        * for ready()
        */
       if (this.onResolver === NOP) {
-        this.onPromise = new Promise(r => this.onResolver = r)
+        this.onPromise = new Promise<void>(r => this.onResolver = r)
       }
       if (state === true && this.offResolver !== NOP) {
         this.offResolver()
