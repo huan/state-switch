@@ -148,17 +148,17 @@ export class StateSwitch {
 
   public async ready(
     state: 'on' | 'off' = 'on',
-    crossWait           = false,
+    noCross             = false,
   ): Promise<void> {
-    this.log.verbose('StateSwitch', 'ready(%s, %s)', state, crossWait)
+    this.log.verbose('StateSwitch', 'ready(%s, %s)', state, noCross)
 
     if (state === 'on') {
-      if (this._on === false && crossWait !== true) {
+      if (this._on === false && noCross === true) {
         throw new Error(`ready(on) but the state is off. call ready(on, true) to force crossWait`)
       }
       await this.onPromise
-    } else {  // off
-      if (this._on === true && crossWait !== true) {
+    } else {  // state === off
+      if (this._on === true && noCross === true) {
         throw new Error('ready(off) but the state is on. call ready(off, true) to force crossWait')
       }
       await this.offPromise
