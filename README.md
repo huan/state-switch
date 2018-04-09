@@ -207,6 +207,15 @@ Check if the state is `pending`.
 `true` means there's some async operations we need to wait.
 `false` means no async on fly.
 
+### ready(expectedState='on', noCross=false): Promise<void>
+
+1. `expectedState`: `'on' | 'off'`, default is `on`
+1. `noCross`: `boolean`, default is `false`
+
+Wait the expected state to be ready.
+
+If set `noCross` to `true`, then `ready()` will throw if you are wait a state from it's opposite site, for example: you can expect an `Exception` when you call `ready('on', true)` when the `on() === 'off'`.
+
 ### name(): string
 
 Get the name from the constructor.
@@ -223,6 +232,17 @@ StateSwitch.setLog(log)
 ```
 
 ## History
+
+### v0.4 master (Apr 2018)
+
+BREAKING CHANGE: Change the `ready()` parameter to the opposite side.
+
+* Before: `ready(state, crossWait=false)`
+* AFTER: `ready(state, noCross=false`)
+
+### v0.3 (Apr 2018)
+
+1. add new method `ready()` to let user wait until the expected state is on(true).
 
 ### v0.2 (Oct 2017)
 

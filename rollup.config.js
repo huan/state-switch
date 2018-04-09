@@ -1,11 +1,13 @@
 import json from 'rollup-plugin-json'
 
 export default {
-  entry: 'dist/state-switch.js',
-  dest: 'bundles/state-switch.es6.umd.js',
-  sourceMap: true,
-  format: 'umd',
-  moduleName: 'window',
+  input: 'dist/state-switch.js',
+  output: {
+    file: 'bundles/state-switch.es6.umd.js',
+    format: 'umd',
+  },
+  sourcemap: true,
+  name: 'window',
   banner: '/* state-switch version ' + require('./package.json').version + ' */',
   footer: '/* https://github.com/zixia */',
   plugins: [

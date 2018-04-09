@@ -2,6 +2,7 @@
 
 // tslint:disable:no-shadowed-variable
 import * as test  from 'blue-tape'
+import * as sinon from 'sinon'
 
 import StateSwitch from './state-switch'
 
@@ -64,4 +65,39 @@ test('version()', t => {
   const ss = new StateSwitch()
   t.ok(ss.version(), 'should get version')
   t.end()
+})
+
+test('ready()', async t => {
+  const spy = sinon.spy()
+
+  const ss = new StateSwitch()
+
+  ss.ready('off').then(() => spy('off'))
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 1, 'should be read off at the initial state')
+
+  spy.resetHistory()
+  ss.ready('on', true).catch(() => spy('on'))
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 1, 'should catch the exception when noCross=true')
+
+  spy.resetHistory()
+  ss.ready('on').then(() => spy('on'))
+  ss.on(true)
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 1, 'should ready(on)')
+
+  spy.resetHistory()
+  ss.ready('on').then(() => spy('on'))
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 1, 'should ready(on) when already on')
+
+  spy.resetHistory()
+  ss.ready('off').then(() => spy('off'))
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 0, 'should not ready(off) when its on')
+
+  ss.off(true)
+  await new Promise(r => setImmediate(r))
+  t.equal(spy.callCount, 1, 'should ready(off) after call off(true)')
 })
