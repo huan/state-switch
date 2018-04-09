@@ -4,7 +4,7 @@ State Switch is a Monitor/Guard for Managing Your Async Operations.
 
 [![Build Status](https://travis-ci.org/zixia/state-switch.svg?branch=master)](https://travis-ci.org/zixia/state-switch) [![npm version](https://badge.fury.io/js/state-switch.svg)](https://badge.fury.io/js/state-switch) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org)
 
-[![State Switch Logo](https://raw.githubusercontent.com/zixia/state-switch/master/state-switch.gif)](https://github.com/zixia/state-switch)
+[![State Switch Logo](https://zixia.github.io/state-switch/images/state-switch.gif)
 
 ## Example
 
