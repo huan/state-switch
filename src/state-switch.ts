@@ -37,9 +37,9 @@ export class StateSwitch {
     } else {
       this.setLog(null)
     }
-    this.log.silly('StateSwitch', 'constructor(%s)', _name)
+    this.log.silly('StateSwitch', 'constructor(name=%s)', _name)
 
-    this._on  = false
+    this._on      = false
     this._pending = false
 
     /**
