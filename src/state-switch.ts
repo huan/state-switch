@@ -163,6 +163,9 @@ export class StateSwitch {
       }
       await this.offPromise
     }
+
+    this.log.silly('StateSwitch', 'ready(%s, %s)-ed.', state, noCross)
+
   }
 
   /**
