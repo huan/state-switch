@@ -150,7 +150,7 @@ export class StateSwitch {
     state: 'on' | 'off' = 'on',
     noCross             = false,
   ): Promise<void> {
-    this.log.verbose('StateSwitch', 'ready(%s, %s)', state, noCross)
+    this.log.verbose('StateSwitch', '<%s> ready(%s, %s)', this._name, state, noCross)
 
     if (state === 'on') {
       if (this._on === false && noCross === true) {
@@ -164,7 +164,7 @@ export class StateSwitch {
       await this.offPromise
     }
 
-    this.log.silly('StateSwitch', 'ready(%s, %s)-ed.', state, noCross)
+    this.log.silly('StateSwitch', '<%s> ready(%s, %s) resolved.', this._name, state, noCross)
 
   }
 
