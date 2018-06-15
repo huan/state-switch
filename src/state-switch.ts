@@ -4,11 +4,11 @@
  *
  * Class StateSwitch
  * Licenst: Apache-2.0
- * https://github.com/zixia/state-switcher
+ * https://github.com/zixia/state-switch
  *
  * Helper Class for Manage State Change
  */
-const NOP = require('nop')
+import NOP from 'nop'
 
 import { version }  from '../package.json'
 export const VERSION = version
