@@ -1,4 +1,4 @@
-const { StateSwitch } = require('state-switch')
+import { StateSwitch } from 'state-switch'
 
 const ss = new StateSwitch()
 ss.on(true)

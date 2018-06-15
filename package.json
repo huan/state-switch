@@ -14,7 +14,7 @@
     "lint:ts": "tslint --project tsconfig.json && tsc --noEmit",
     "demo": "ts-node example/demo",
     "test": "npm run lint && npm run test:ts",
-    "test:npm": "npm run dist && export TMPDIR=/tmp/npm-test.$$ && mkdir $TMPDIR && npm pack && mv *-*.*.*.tgz $TMPDIR && cp tests/fixtures/smoke-testing.js $TMPDIR && cd $TMPDIR && npm init -y && npm i *-*.*.*.tgz && node smoke-testing.js",
+    "test:pack": "bash -x scripts/npm-pack-testing.sh",
     "test:ts": "blue-tape -r ts-node/register -r source-map-support/register src/*.spec.ts"
   },
   "repository": {

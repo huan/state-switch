@@ -1,4 +1,4 @@
-# state-switch
+# STATE-SWITCH
 
 State Switch is a Monitor/Guard for Managing Your Async Operations.
 
@@ -6,11 +6,12 @@ State Switch is a Monitor/Guard for Managing Your Async Operations.
 
 [![State Switch Logo](https://zixia.github.io/state-switch/images/state-switch.gif)
 
-## Example
+## EXAMPLE
 
 Talk is cheap, show me the code!
 
 ### Code
+
 ```ts
 import { StateSwitch } from '../src/state-switch'
 
@@ -172,7 +173,7 @@ CALL: conn.disconnect(): should not disconnect again if we are close
 
 That's the idea: **we should always be able to know the state of our async operation**.
 
-## API Reference
+## API REFERENCE
 
 Class StateSwitch
 
@@ -231,7 +232,11 @@ const log = Brolog.instance()
 StateSwitch.setLog(log)
 ```
 
-## History
+## CHANGELOG
+
+### v0.6 master (Jun 2018)
+
+1. DevOps for publishing to NPM@next for odd minor versions.
 
 ### v0.4 master (Apr 2018)
 
@@ -263,16 +268,16 @@ Orignal name is `StateMonitor`
 
 1. Part of the [Wechaty](https://github.com/Chatie/wechaty) project
 
-Author
-------
+## AUTHOR
+
 Huan LI <zixia@zixia.net> (http://linkedin.com/in/zixia)
 
 <a href="http://stackoverflow.com/users/1123955/zixia">
   <img src="http://stackoverflow.com/users/flair/1123955.png" width="208" height="58" alt="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for zixia at Stack Overflow, Q&amp;A for professional and enthusiast programmers">
 </a>
 
-Copyright & License
--------------------
+## COPYRIGHT & LICENSE
+
 * Code & Docs 2016-2017© zixia
 * Code released under the Apache-2.0 license
 * Docs released under Creative Commons
