@@ -245,6 +245,7 @@ StateSwitch.setLog(log)
 ### v0.6 master (Jun 2018)
 
 1. DevOps for publishing to NPM@next for odd minor versions.
+1. Add State Diagram for easy understanding what state-switch do
 
 ### v0.4 master (Apr 2018)
 
