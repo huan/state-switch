@@ -136,6 +136,14 @@ setTimeout(() => {
 
 ```
 
+### Diagram
+
+What's the meaning of the above code?
+
+StateSwitch helps you manage the following four states easy:
+
+[![State Switch Diagram](https://zixia.github.io/state-switch/images/state-switch-diagram.gif)
+
 ### Run
 
 ```shell
