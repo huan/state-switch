@@ -10,8 +10,13 @@
  */
 import NOP from 'nop'
 
-import { version }  from '../package.json'
-export const VERSION = version
+// import { version } from '../package.json'
+export let VERSION = '0.0.0'
+try {
+  VERSION = require('../package.json').version
+} catch (e) {
+  //
+}
 
 // 'pending': it's in process, not stable.
 export type Pending = 'pending'
