@@ -38,7 +38,7 @@
     "@types/sinon": "^5.0.1",
     "blue-tape": "^1.0.0",
     "git-scripts": "^0.2.1",
-    "rollup": "^0.64.1",
+    "rollup": "^0.65.2",
     "rollup-plugin-json": "^3.0.0",
     "sinon": "^6.1.5",
     "ts-node": "^7.0.1",
