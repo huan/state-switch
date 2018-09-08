@@ -16,6 +16,7 @@ npm install *-*.*.*.tgz \
   typescript@latest
 
 ./node_modules/.bin/tsc \
+  --esModuleInterop \
   --lib esnext \
   --noEmitOnError \
   --noImplicitAny \
