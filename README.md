@@ -2,9 +2,9 @@
 
 State Switch is a Monitor/Guard for Managing Your Async Operations.
 
-[![Build Status](https://travis-ci.org/zixia/state-switch.svg?branch=master)](https://travis-ci.org/zixia/state-switch) [![npm version](https://badge.fury.io/js/state-switch.svg)](https://badge.fury.io/js/state-switch) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org) [![Greenkeeper badge](https://badges.greenkeeper.io/zixia/state-switch.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/zixia/state-switch.svg?branch=master)](https://travis-ci.org/zixia/state-switch) [![npm version](https://badge.fury.io/js/state-switch.svg)](https://badge.fury.io/js/state-switch) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard-flat.svg)](http://definitelytyped.org) [![Greenkeeper badge](https://badges.greenkeeper.io/huan/state-switch.svg)](https://greenkeeper.io/)
 
-![State Switch Logo](https://zixia.github.io/state-switch/images/state-switch.gif)
+![State Switch Logo](https://huan.github.io/state-switch/images/state-switch.gif)
 
 ## EXAMPLE
 
@@ -142,7 +142,7 @@ What's the meaning of the above code?
 
 StateSwitch helps you manage the following four states easy:
 
-![State Switch Diagram](https://zixia.github.io/state-switch/images/state-switch-diagram.png)
+![State Switch Diagram](https://huan.github.io/state-switch/images/state-switch-diagram.png)
 
 ### Run
 
