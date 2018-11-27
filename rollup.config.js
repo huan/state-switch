@@ -9,7 +9,7 @@ export default {
   sourcemap: true,
   name: 'window',
   banner: '/* state-switch version ' + require('./package.json').version + ' */',
-  footer: '/* https://github.com/zixia */',
+  footer: '/* https://github.com/huan */',
   plugins: [
     json({
       // All JSON files will be parsed by default,

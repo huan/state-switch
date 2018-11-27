@@ -4,7 +4,7 @@
  *
  * Class StateSwitch
  * Licenst: Apache-2.0
- * https://github.com/zixia/state-switch
+ * https://github.com/huan/state-switch
  *
  * Helper Class for Manage State Change
  */
