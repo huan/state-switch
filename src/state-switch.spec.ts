@@ -72,32 +72,32 @@ test('ready()', async t => {
 
   const ss = new StateSwitch()
 
-  ss.ready('off').then(() => spy('off'))
-  await new Promise(r => setImmediate(r))
+  ss.ready('off').then(() => spy('off')).catch(() => t.fail('rejection'))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should be read off at the initial state')
 
   spy.resetHistory()
   ss.ready('on', true).catch(() => spy('on'))
-  await new Promise(r => setImmediate(r))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should catch the exception when noCross=true')
 
   spy.resetHistory()
-  ss.ready('on').then(() => spy('on'))
+  ss.ready('on').then(() => spy('on')).catch(() => t.fail('rejection'))
   ss.on(true)
-  await new Promise(r => setImmediate(r))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should ready(on)')
 
   spy.resetHistory()
-  ss.ready('on').then(() => spy('on'))
-  await new Promise(r => setImmediate(r))
+  ss.ready('on').then(() => spy('on')).catch(() => t.fail('rejection'))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should ready(on) when already on')
 
   spy.resetHistory()
-  ss.ready('off').then(() => spy('off'))
-  await new Promise(r => setImmediate(r))
+  ss.ready('off').then(() => spy('off')).catch(() => t.fail('rejection'))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 0, 'should not ready(off) when its on')
 
   ss.off(true)
-  await new Promise(r => setImmediate(r))
+  await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should ready(off) after call off(true)')
 })

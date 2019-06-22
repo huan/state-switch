@@ -10,18 +10,13 @@
  */
 import NOP from 'nop'
 
-// import { version } from '../package.json'
-export let VERSION = '0.0.0'
-try {
-  VERSION = require('../package.json').version
-} catch (e) {
-  //
-}
+import { VERSION } from './version'
 
 // 'pending': it's in process, not stable.
 export type Pending = 'pending'
 
 export class StateSwitch {
+
   private _on     : boolean
   private _pending: boolean
 
@@ -33,7 +28,7 @@ export class StateSwitch {
   private onResolver:   Function
   private offResolver:  Function
 
-  constructor(
+  constructor (
     private _name = 'Lock',
     logInstance?: any,
   ) {
@@ -51,26 +46,27 @@ export class StateSwitch {
      * for ready()
      */
     this.offPromise = Promise.resolve()
-    this.onPromise  = new Promise<void>(r => {
-      this.onResolver = r
+    this.onPromise  = new Promise<void>(resolve => {
+      this.onResolver = resolve
     })
     this.offResolver = NOP
 
   }
 
-  public version(): string {
+  public version (): string {
     return VERSION
   }
 
-  public setLog(logInstance?: any) {
+  public setLog (logInstance?: any) {
     if (logInstance) {
       this.log = logInstance
     } else {
+      /* eslint @typescript-eslint/no-unused-vars: off */
       this.log = {
-        silly(...args)    { /* nop */ },
-        verbose(...args)  { /* nop */ },
-        warn(...args)     { /* nop */ },
-        error(...args)    { /* nop */ },
+        silly (..._)    { /* nop */ },
+        verbose (..._)  { /* nop */ },
+        warn (..._)     { /* nop */ },
+        error (..._)    { /* nop */ },
       }
     }
   }
@@ -81,13 +77,13 @@ export class StateSwitch {
   /**
    * set/get ON state
    */
-  public on(state?: true | Pending): boolean | Pending | void {
+  public on (state?: true | Pending): boolean | Pending | void {
     if (state) {
       this.log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
-                                      this._name,
-                                      state,
-                                      this.on(),
-                      )
+        this._name,
+        state,
+        this.on(),
+      )
 
       this._on = true
       this._pending = (state === 'pending')
@@ -96,7 +92,7 @@ export class StateSwitch {
        * for ready()
        */
       if (this.offResolver === NOP) {
-        this.offPromise = new Promise<void>(r => this.offResolver = r)
+        this.offPromise = new Promise<void>(resolve => (this.offResolver = resolve))
       }
       if (state === true && this.onResolver !== NOP) {
         this.onResolver()
@@ -107,8 +103,8 @@ export class StateSwitch {
     }
 
     const on = this._on
-                ? this._pending ? 'pending' : true
-                : false
+      ? this._pending ? 'pending' : true
+      : false
     this.log.silly('StateSwitch', '<%s> on() is %s', this._name, on)
     return on
   }
@@ -120,13 +116,13 @@ export class StateSwitch {
   /**
    * set/get OFF state
    */
-  public off(state?: true | Pending): boolean | Pending | void {
+  public off (state?: true | Pending): boolean | Pending | void {
     if (state) {
       this.log.verbose('StateSwitch', '<%s> off(%s) <- (%s)',
-                                  this._name,
-                                  state,
-                                  this.off(),
-                      )
+        this._name,
+        state,
+        this.off(),
+      )
       this._on      = false
       this._pending = (state === 'pending')
 
@@ -134,7 +130,7 @@ export class StateSwitch {
        * for ready()
        */
       if (this.onResolver === NOP) {
-        this.onPromise = new Promise<void>(r => this.onResolver = r)
+        this.onPromise = new Promise<void>(resolve => (this.onResolver = resolve))
       }
       if (state === true && this.offResolver !== NOP) {
         this.offResolver()
@@ -145,13 +141,13 @@ export class StateSwitch {
     }
 
     const off = !this._on
-                ? this._pending ? 'pending' : true
-                : false
+      ? this._pending ? 'pending' : true
+      : false
     this.log.silly('StateSwitch', '<%s> off() is %s', this._name, off)
     return off
   }
 
-  public async ready(
+  public async ready (
     state: 'on' | 'off' = 'on',
     noCross             = false,
   ): Promise<void> {
@@ -176,7 +172,7 @@ export class StateSwitch {
   /**
    * does the state is not stable(in process)?
    */
-  public pending() {
+  public pending () {
     this.log.silly('StateSwitch', '<%s> pending() is %s', this._name, this._pending)
     return this._pending
   }
@@ -184,9 +180,14 @@ export class StateSwitch {
   /**
    * get the client name
    */
-  public name() {
+  public name () {
     return this._name
   }
+
+}
+
+export {
+  VERSION,
 }
 
 export default StateSwitch
