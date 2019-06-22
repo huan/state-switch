@@ -1,4 +1,4 @@
-import StateSwitchDefault, {
+import Default, {
   StateSwitch,
   VERSION,
 }               from 'state-switch'
@@ -11,8 +11,8 @@ const ss = new StateSwitch()
 ss.on(true)
 console.info(`StateSwitch v${ss.version()}`)
 
-const ssDefault = new StateSwitchDefault()
-ssDefault.on(true)
-console.info(`StateSwitch default export v${ssDefault.version()}`)
+if (Default !== StateSwitch) {
+  throw new Error('default export does not match the exported module!')
+}
 
 console.info('Smoke Testing PASSED!')
