@@ -63,10 +63,10 @@ export class StateSwitch {
     } else {
       /* eslint @typescript-eslint/no-unused-vars: off */
       this.log = {
+        error (..._)    { /* nop */ },
         silly (..._)    { /* nop */ },
         verbose (..._)  { /* nop */ },
         warn (..._)     { /* nop */ },
-        error (..._)    { /* nop */ },
       }
     }
   }
