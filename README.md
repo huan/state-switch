@@ -13,7 +13,7 @@ Talk is cheap, show me the code!
 ### Code
 
 ```ts
-import { StateSwitch } from '../src/state-switch'
+import { StateSwitch } from 'state-switch'
 
 function doSlowConnect() {
   console.log('> doSlowConnect() started')
