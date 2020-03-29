@@ -242,12 +242,16 @@ StateSwitch.setLog(log)
 
 ## CHANGELOG
 
-### v0.6 master (Jun 2018)
+### v0.9 master (Mar 2020)
+
+1. Support emit `on` and `off` events with the args of the `state` of two values: `true` and `pending`.
+
+### v0.6 (Jun 2018)
 
 1. DevOps for publishing to NPM@next for odd minor versions.
 1. Add State Diagram for easy understanding what state-switch do
 
-### v0.4 master (Apr 2018)
+### v0.4 (Apr 2018)
 
 BREAKING CHANGE: Change the `ready()` parameter to the opposite side.
 

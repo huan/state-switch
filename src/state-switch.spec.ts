@@ -4,7 +4,7 @@
 import test  from 'blue-tape'
 import sinon from 'sinon'
 
-import StateSwitch from './state-switch'
+import { StateSwitch } from './state-switch'
 
 test('on()', async t => {
   const ss = new StateSwitch()
@@ -39,26 +39,26 @@ test('off()', async t => {
   t.notOk(ss.off(), 'should not OFF after on()')
 })
 
-test('pending()', async t => {
+test('pending', async t => {
   const ss = new StateSwitch()
 
-  t.notOk(ss.pending(), 'default is not pending')
+  t.notOk(ss.pending, 'default is not pending')
 
   ss.on('pending')
-  t.ok(ss.pending(), 'should in pending state')
+  t.ok(ss.pending, 'should in pending state')
 
   ss.on(true)
-  t.notOk(ss.pending(), 'should not in pending state')
+  t.notOk(ss.pending, 'should not in pending state')
 
   ss.off('pending')
-  t.ok(ss.pending(), 'should in pending state')
+  t.ok(ss.pending, 'should in pending state')
 })
 
 test('name', async t => {
   const CLIENT_NAME = 'StateSwitchTest'
   const ss = new StateSwitch(CLIENT_NAME)
 
-  t.is(ss.name(), CLIENT_NAME, 'should get the same client name as init')
+  t.is(ss.name, CLIENT_NAME, 'should get the same client name as init')
 })
 
 test('version()', t => {
