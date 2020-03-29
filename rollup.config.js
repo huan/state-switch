@@ -5,10 +5,10 @@ export default {
   output: {
     banner: '/* state-switch version ' + require('./package.json').version + ' */',
     file: 'bundles/state-switch.es6.umd.js',
+    footer: '/* https://github.com/huan */',
     format: 'umd',
     name: 'window',
     sourcemap: true,
-    footer: '/* https://github.com/huan */',
   },
   plugins: [
     json({
