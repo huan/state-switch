@@ -244,7 +244,20 @@ StateSwitch.setLog(log)
 
 ### v0.9 master (Mar 2020)
 
+Support for using RxJS:
+
+```ts
+const notPending = (state: true | 'pending') => state === true
+
+const stateOn$ = fromEvent(stateSwitch, 'on').pipe(
+  filter(notPending)
+)
+```
+
+See: [RxJS - operator - fromEvent - Node.js EventEmitter: An object with addListener and removeListener methods.](https://rxjs.dev/api/index/function/fromEvent)
+
 1. Support emit `on` and `off` events with the args of the `state` of two values: `true` and `pending`.
+1. Add events unit tests
 
 ### v0.6 (Jun 2018)
 
