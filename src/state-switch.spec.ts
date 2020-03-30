@@ -101,3 +101,36 @@ test('ready()', async t => {
   await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should ready(off) after call off(true)')
 })
+
+test('on/off events emitting', async t => {
+  const spyOn  = sinon.spy()
+  const spyOff = sinon.spy()
+
+  const ss = new StateSwitch()
+
+  ss.addListener('on',  spyOn)
+  ss.addListener('off', spyOff)
+
+  t.true(spyOn.notCalled, 'spyOn is not called')
+  t.true(spyOff.notCalled, 'spyOff is not called')
+
+  ss.on('pending')
+  t.true(spyOn.calledOnce, 'spyOn is called once after on(pending)')
+  t.deepEqual(spyOn.args[0], ['pending'], 'spyOn should be called with `pending` arg')
+  t.true(spyOff.notCalled, 'spyOff is not called')
+
+  ss.on(true)
+  t.true(spyOn.calledTwice, 'spyOn is called once after on(pending)')
+  t.deepEqual(spyOn.args[1], [true], 'spyOn should be called with `true` arg')
+  t.true(spyOff.notCalled, 'spyOff is not called')
+
+  ss.off('pending')
+  t.true(spyOff.calledOnce, 'spyOff is called once after off(pending)')
+  t.deepEqual(spyOff.args[0], ['pending'], 'spyOff should be called with `pending` arg')
+
+  ss.off(true)
+  t.true(spyOff.calledTwice, 'spyOff is called twice after off(true)')
+  t.deepEqual(spyOff.args[1], [true], 'spyOff should be called with `true` arg')
+
+  t.true(spyOn.calledTwice, 'spyOn called twice at last')
+})
