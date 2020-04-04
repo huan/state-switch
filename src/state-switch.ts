@@ -235,4 +235,28 @@ export class StateSwitch extends EventEmitter {
 
   }
 
+  /**
+   * To make RxJS fromEvent happy: type inferencing
+   *  https://github.com/ReactiveX/rxjs/blob/49304ffef8d7a0663c57fe8e673359a602e9d3e1/src/internal/observable/fromEvent.ts#L27-L30
+   */
+  public addEventListener (
+    type: 'on' | 'off',
+    listener: ((evt: true | 'pending') => void) | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void {
+    if (listener) {
+      super.addListener(type, listener)
+    }
+  }
+
+  removeEventListener (
+    type: string,
+    listener?: ((evt: true | 'pending') => void) | null,
+    options?: EventListenerOptions | boolean,
+  ): void {
+    if (listener) {
+      super.removeListener(type, listener)
+    }
+  }
+
 }
