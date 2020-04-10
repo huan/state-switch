@@ -40,7 +40,7 @@
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^0.8.0",
     "pkg-jq": "^0.2.4",
-    "rollup": "^2.3.0",
+    "rollup": "^2.4.0",
     "rollup-plugin-json": "^4.0.0",
     "tstest": "^0.4.2"
   },
