@@ -8,8 +8,12 @@ if (VERSION === '0.0.0') {
 }
 
 const ss = new StateSwitch()
-ss.on(true)
 console.info(`StateSwitch v${ss.version()}`)
+
+ss.on('pending')
+ss.on(true)
+ss.off('pending')
+ss.on(true)
 
 if (Default !== StateSwitch) {
   throw new Error('default export does not match the exported module!')
