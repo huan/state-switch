@@ -3,7 +3,7 @@
   "version": "0.11.1",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "bundles/state-switch.umd.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/src/mod.d.ts",
   "scripts": {
     "clean": "rm -fr dist/* bundles/*",
     "dist": "npm run clean && npm run build && npm run rollup && npm run dist:es6to5",

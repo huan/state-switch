@@ -1,7 +1,7 @@
 import json from 'rollup-plugin-json'
 
 export default {
-  input: 'dist/index.js',
+  input: 'dist/src/mod.js',
   output: {
     banner: '/* state-switch version ' + require('./package.json').version + ' */',
     file: 'bundles/state-switch.es6.umd.js',
