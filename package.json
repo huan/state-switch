@@ -15,7 +15,7 @@
     "demo": "ts-node example/demo",
     "test": "npm run lint && npm run test:ts",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
-    "test:ts": "blue-tape -r ts-node/register src/*.spec.ts",
+    "test:ts": "blue-tape -r ts-node/register src/**/*.spec.ts tests/**/*.spec.ts",
     "lint:es": "eslint --ignore-pattern fixtures/ 'src/**/*.ts' 'tests/**/*.ts'"
   },
   "repository": {

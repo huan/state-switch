@@ -38,11 +38,11 @@ test('RxJS: fromEvent type inference', async (t) => {
 
 test('RxJS: fromEvent stream for the second value', async (t) => {
   const state = new StateSwitch()
-  const event$ = fromEvent(state, 'on')
-  state.on('pending')
+  const event$ = fromEvent(state, 'off')
+  state.off('pending')
 
   const future = firstValueFrom(event$)
-  state.on(true)
+  state.off(true)
 
   const result = await future
   t.equal(result, true, 'should get "true" result')

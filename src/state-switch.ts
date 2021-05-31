@@ -242,22 +242,20 @@ export class StateSwitch extends EventEmitter {
    *  https://github.com/ReactiveX/rxjs/blob/92fbdda7c06561bc73dae3c14de3fc7aff92bbd4/src/internal/observable/fromEvent.ts#L39-L50
    */
   public addEventListener (
-    type: 'on' | 'off',
-    listener: ((evt: true | 'pending') => void) | null,
-    options?: boolean | AddEventListenerOptions,
+    event: 'on' | 'off',
+    listener: ((payload: true | 'pending') => void),
   ): void {
     if (listener) {
-      super.addListener(type, listener)
+      super.addListener(event, listener)
     }
   }
 
   removeEventListener (
-    type: string,
-    listener: ((evt: true | 'pending') => void) | null,
-    options?: EventListenerOptions | boolean,
+    event: string,
+    listener: ((payload: true | 'pending') => void),
   ): void {
     if (listener) {
-      super.removeListener(type, listener)
+      super.removeListener(event, listener)
     }
   }
 
