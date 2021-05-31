@@ -245,6 +245,10 @@ StateSwitch.setLog(log)
 
 ## CHANGELOG
 
+### master
+
+1. Add RxJS typing unit tests for making sure that the `fromEvent` typing inference is right.
+
 ### v0.9 master (Mar 2020)
 
 Support for using RxJS:

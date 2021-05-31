@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "0.9.9",
+  "version": "0.11.0",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "bundles/state-switch.umd.js",
   "types": "dist/index.d.ts",
@@ -35,14 +35,16 @@
   },
   "homepage": "https://github.com/huan/state-switch#readme",
   "devDependencies": {
-    "@chatie/eslint-config": "^0.12.1",
-    "@chatie/git-scripts": "^0.6.1",
+    "@chatie/eslint-config": "^0.12.3",
+    "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
-    "@chatie/tsconfig": "^0.14.1",
-    "pkg-jq": "^0.2.4",
-    "rollup": "^2.4.0",
+    "@chatie/tsconfig": "^0.16.2",
+    "pkg-jq": "^0.2.11",
+    "rollup": "^2.50.5",
     "rollup-plugin-json": "^4.0.0",
-    "tstest": "^0.4.2"
+    "rxjs": "^7.1.0",
+    "tsd": "^0.16.0",
+    "tstest": "^0.4.10"
   },
   "files": [
     "LICENSE",

@@ -41,6 +41,7 @@ export class StateSwitch extends EventEmitter {
 
   private _onoff   : boolean
   private _pending : boolean
+
   /**
    * does the state is not stable(in process)?
    */
@@ -54,6 +55,7 @@ export class StateSwitch extends EventEmitter {
     public readonly options: StateSwitchOptions = {},
   ) {
     super()
+
     if (options.log) {
       this.setLog(options.log)
     } else {
@@ -88,10 +90,10 @@ export class StateSwitch extends EventEmitter {
     } else {
       /* eslint @typescript-eslint/no-unused-vars: off */
       this.log = {
-        error (..._)    { /* nop */ },
-        silly (..._)    { /* nop */ },
-        verbose (..._)  { /* nop */ },
-        warn (..._)     { /* nop */ },
+        error   : NOP,
+        silly   : NOP,
+        verbose : NOP,
+        warn    : NOP,
       }
     }
   }
@@ -216,14 +218,14 @@ export class StateSwitch extends EventEmitter {
 
     if (state === 'on') {
       if (this._onoff === false && noCross === true) {
-        throw new Error(`ready(on) but the state is off. call ready(on, true) to force crossWait`)
+        throw new Error('ready(on) but the state is off. call ready(on, false) to disable noCross')
       }
 
       await this.onPromise
 
     } else if (state === 'off') {
       if (this._onoff === true && noCross === true) {
-        throw new Error('ready(off) but the state is on. call ready(off, true) to force crossWait')
+        throw new Error('ready(off) but the state is on. call ready(off, false) to disable noCross')
       }
       await this.offPromise
 
@@ -236,8 +238,8 @@ export class StateSwitch extends EventEmitter {
   }
 
   /**
-   * To make RxJS fromEvent happy: type inferencing
-   *  https://github.com/ReactiveX/rxjs/blob/49304ffef8d7a0663c57fe8e673359a602e9d3e1/src/internal/observable/fromEvent.ts#L27-L30
+   * Huan(202105): To make RxJS fromEvent happy: type inferencing
+   *  https://github.com/ReactiveX/rxjs/blob/92fbdda7c06561bc73dae3c14de3fc7aff92bbd4/src/internal/observable/fromEvent.ts#L39-L50
    */
   public addEventListener (
     type: 'on' | 'off',
@@ -251,7 +253,7 @@ export class StateSwitch extends EventEmitter {
 
   removeEventListener (
     type: string,
-    listener?: ((evt: true | 'pending') => void) | null,
+    listener: ((evt: true | 'pending') => void) | null,
     options?: EventListenerOptions | boolean,
   ): void {
     if (listener) {
