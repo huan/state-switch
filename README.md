@@ -9,6 +9,26 @@
 
 State Switch is a Monitor/Guard for Managing Your Async Operations.
 
+## Introduction
+
+`StateSwitch` can manage state transition for you, by switching from the following four states:
+
+1. `OFF`: state is off
+1. `pending ON`: state is switching from OFF to ON
+1. `ON`: state is on
+1. `pending OFF`: state is switch from ON to OFF
+
+You can set/get the state with the API, and you can also monite the state switch events by listening the 'on' and 'off' events.
+
+There have another `read()` API return a `Promise` so that you can wait the `on` of `off` events by:
+
+```ts
+await state.ready('on')
+await state.ready('off')
+```
+
+If the state is already ON when you `await state.ready('on')`, then it will resolved immediatelly.
+
 ## EXAMPLE
 
 Talk is cheap, show me the code!
