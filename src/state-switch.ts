@@ -214,7 +214,7 @@ export class StateSwitch extends EventEmitter {
     state: 'on' | 'off' = 'on',
     noCross             = false,
   ): Promise<void> {
-    this.log.verbose('StateSwitch', '<%s> ready(%s, %s)', this.name, state, noCross)
+    this.log.verbose('StateSwitch', '<%s> ready(%s, noCross=%s)', this.name, state, noCross)
 
     if (state === 'on') {
       if (this._onoff === false && noCross === true) {
