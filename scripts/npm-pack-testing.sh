@@ -10,8 +10,11 @@ mv *-*.*.*.tgz "$TMPDIR"
 cp tests/fixtures/smoke-testing.ts "$TMPDIR"
 
 cd $TMPDIR
+
 npm init -y
+# https://stackoverflow.com/a/59203952/1123955
 echo "`jq '.type="module"' package.json`" > package.json
+
 npm install *-*.*.*.tgz \
   @types/node \
   typescript@latest
