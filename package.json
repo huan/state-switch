@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "0.15.2",
+  "version": "0.15.3",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "./dist/cjs/src/mod.js",
   "type": "module",
