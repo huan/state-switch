@@ -30,4 +30,4 @@ npm install *-*.*.*.tgz \
   --moduleResolution node \
   smoke-testing.ts
 
-node smoke-testing.js
+node --experimental-specifier-resolution=node smoke-testing.js
