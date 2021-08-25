@@ -265,7 +265,11 @@ StateSwitch.setLog(log)
 
 ## CHANGELOG
 
-### master
+### master v0.15
+
+Publish as ESM package.
+
+### v0.14
 
 1. Add RxJS typing unit tests for making sure that the `fromEvent` typing inference is right.
 
@@ -334,4 +338,3 @@ Huan LI <zixia@zixia.net> (http://linkedin.com/in/zixia)
 * Code & Docs 2016-2017© zixia
 * Code released under the Apache-2.0 license
 * Docs released under Creative Commons
-
