@@ -24,9 +24,7 @@ jobs:
         run: npm install
 
       - name: Test
-        run: |
-          ls -la
-          npm test
+        run: npm test
 
   pack:
     name: Pack
