@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "bundles/state-switch.umd.js",
   "types": "dist/src/mod.d.ts",
