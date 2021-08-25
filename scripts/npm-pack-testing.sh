@@ -12,12 +12,34 @@ cp tests/fixtures/smoke-testing.ts "$TMPDIR"
 cd $TMPDIR
 
 npm init -y
-# https://stackoverflow.com/a/59203952/1123955
-echo "`jq '.type="module"' package.json`" > package.json
-
 npm install *-*.*.*.tgz \
   @types/node \
   typescript@latest
+
+#
+# CommonJS
+#
+./node_modules/.bin/tsc \
+  --esModuleInterop \
+  --lib esnext \
+  --noEmitOnError \
+  --noImplicitAny \
+  --skipLibCheck \
+  --target es5 \
+  --module CommonJS \
+  --moduleResolution node \
+  smoke-testing.ts
+
+echo
+echo "CommonJS: pack testing..."
+node smoke-testing.js
+
+#
+# ES Modules
+#
+
+# https://stackoverflow.com/a/59203952/1123955
+echo "`jq '.type="module"' package.json`" > package.json
 
 ./node_modules/.bin/tsc \
   --esModuleInterop \
@@ -30,4 +52,6 @@ npm install *-*.*.*.tgz \
   --moduleResolution node \
   smoke-testing.ts
 
+echo
+echo "ES Module: pack testing..."
 node smoke-testing.js
