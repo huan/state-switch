@@ -40,4 +40,5 @@ jspm_packages
 /bundles/
 /package-lock.json
 /state-switch-*.*.*.tgz
-
+t.*
+t/

@@ -1,6 +1,10 @@
+import {
+  StateSwitch,
+}                   from './state-switch.js'
+import { VERSION }  from './version.js'
+
 export {
   StateSwitch,
-  StateSwitch as default,
-}                           from './state-switch'
-
-export { VERSION } from './version'
+  VERSION,
+}
+export default StateSwitch

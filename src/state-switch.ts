@@ -12,7 +12,7 @@ import { EventEmitter } from 'events'
 
 import NOP from 'nop'
 
-import { VERSION } from './version'
+import { VERSION } from './version.js'
 
 /**
  * Using Three Valued Logic for ON/OFF State

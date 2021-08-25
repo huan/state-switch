@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "target": "es2020",
+    "module": "es2020",
     "moduleResolution": "node",
-    "outDir": "dist",
+    "outDir": "dist/esm",
     "declaration": true,
     "sourceMap": true,
     "noLib": false,

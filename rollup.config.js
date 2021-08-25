@@ -4,11 +4,12 @@ export default {
   input: 'dist/src/mod.js',
   output: {
     banner: '/* state-switch version ' + require('./package.json').version + ' */',
-    file: 'bundles/state-switch.es6.umd.js',
+    file: 'bundles/state-switch.es6.js',
     footer: '/* https://github.com/huan */',
-    format: 'umd',
+    format: 'es',
     name: 'window',
     sourcemap: true,
+    exports: 'named',
   },
   plugins: [
     json({
