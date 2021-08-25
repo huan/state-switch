@@ -1,7 +1,7 @@
 import {
   StateSwitch,
-}                   from './state-switch'
-import { VERSION }  from './version'
+}                   from './state-switch.js'
+import { VERSION }  from './version.js'
 
 export {
   StateSwitch,

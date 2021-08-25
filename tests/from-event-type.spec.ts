@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-specifier-resolution=node --loader ts-node/esm
+#!/usr/bin/env node --loader ts-node/esm
 
 import { test }  from 'tstest'
 import {
@@ -13,7 +13,7 @@ import {
 }                 from 'rxjs'
 import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent'
 
-import { StateSwitch } from '../src/state-switch'
+import { StateSwitch } from '../src/state-switch.js'
 
 test('StateSwitch satisfy DOM EventTarget: HasEventTargetAddRemove', async t => {
   const state = new StateSwitch()

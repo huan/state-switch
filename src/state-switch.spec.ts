@@ -1,11 +1,11 @@
-#!/usr/bin/env node --experimental-specifier-resolution=node --loader ts-node/esm
+#!/usr/bin/env node --loader ts-node/esm
 
 import {
   test,
   sinon,
 }             from 'tstest'
 
-import { StateSwitch } from './state-switch'
+import { StateSwitch } from './state-switch.js'
 
 test('on()', async t => {
   const ss = new StateSwitch()

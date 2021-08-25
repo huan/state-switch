@@ -16,7 +16,7 @@
     "demo": "ts-node example/demo",
     "test": "npm run lint && npm run test:ts",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
-    "test:ts": "tap --node-arg=--experimental-specifier-resolution=node --node-arg=--loader=ts-node/esm src/**/*.spec.ts tests/**/*.spec.ts",
+    "test:ts": "tap --node-arg=--loader=ts-node/esm src/**/*.spec.ts tests/**/*.spec.ts",
     "lint:es": "eslint --ignore-pattern fixtures/ 'src/**/*.ts' 'tests/**/*.ts'"
   },
   "repository": {
