@@ -3,6 +3,7 @@
   "version": "0.15.8",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "main": "./dist/cjs/src/mod.js",
+  "typings": "./dist/esm/src/mod.d.ts",
   "type": "module",
   "exports": {
     ".": {
@@ -10,7 +11,6 @@
       "require": "./dist/cjs/src/mod.js"
     }
   },
-  "typings": "./dist/esm/src/mod.d.ts",
   "scripts": {
     "clean": "rm -fr dist/* bundles/*",
     "dist": "npm run clean && npm run build && (cd dist/cjs; npm init -y > /dev/null)",
