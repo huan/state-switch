@@ -1,7 +1,6 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --experimental-specifier-resolution=node --loader ts-node/esm
 
-// tslint:disable:no-shadowed-variable
-import test  from 'tstest'
+import { test } from 'tstest'
 
 import { VERSION } from './version'
 

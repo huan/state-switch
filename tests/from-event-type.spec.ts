@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --experimental-specifier-resolution=node --loader ts-node/esm
 
 import { test }  from 'tstest'
 import {

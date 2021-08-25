@@ -11,6 +11,7 @@ cp tests/fixtures/smoke-testing.ts "$TMPDIR"
 
 cd $TMPDIR
 npm init -y
+echo "`jq '.type="module"' package.json`" > package.json
 npm install *-*.*.*.tgz \
   @types/node \
   typescript@latest
@@ -21,6 +22,9 @@ npm install *-*.*.*.tgz \
   --noEmitOnError \
   --noImplicitAny \
   --skipLibCheck \
+  --target es2020 \
+  --module es2020 \
+  --moduleResolution node \
   smoke-testing.ts
 
 node smoke-testing.js

@@ -3,10 +3,6 @@ import Default, {
   VERSION,
 }               from 'state-switch'
 
-if (VERSION === '0.0.0') {
-  throw new Error('version should be set before publishing')
-}
-
 const ss = new StateSwitch()
 console.info(`StateSwitch v${ss.version()}`)
 
@@ -17,6 +13,10 @@ ss.on(true)
 
 if (Default !== StateSwitch) {
   throw new Error('default export does not match the exported module!')
+}
+
+if (VERSION === '0.0.0') {
+  throw new Error('version should be set before publishing')
 }
 
 console.info('Smoke Testing PASSED!')
