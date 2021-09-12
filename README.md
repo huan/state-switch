@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/state-switch.svg)](https://badge.fury.io/js/state-switch)
 [![NPM](https://github.com/huan/state-switch/workflows/NPM/badge.svg)](https://github.com/huan/state-switch/actions?query=workflow%3ANPM)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-
+[![ES Modules](https://img.shields.io/badge/ES-Modules-brightgreen)](https://github.com/Chatie/tsconfig/issues/16)
 
 ![State Switch Logo](https://huan.github.io/state-switch/images/state-switch.gif)
 
