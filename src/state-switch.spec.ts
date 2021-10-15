@@ -1,4 +1,4 @@
-#!/usr/bin/env node --loader ts-node/esm
+#!/usr/bin/env -S node --loader ts-node/esm
 
 import {
   test,
@@ -101,6 +101,25 @@ test('ready()', async t => {
   ss.off(true)
   await new Promise(resolve => setImmediate(resolve))
   t.equal(spy.callCount, 1, 'should ready(off) after call off(true)')
+})
+
+test('ready() without default arg for waiting current state', async t => {
+  const spy = sinon.spy()
+  const ss = new StateSwitch()
+
+  ss.off('pending')
+  ss.ready().then(() => spy('off')).catch(() => t.fail('rejection'))
+  ss.off(true)
+  await new Promise(resolve => setImmediate(resolve))
+  t.equal(spy.callCount, 1, 'should be ready() for off(true)')
+
+  spy.resetHistory()
+
+  ss.on('pending')
+  ss.ready().then(() => spy('on')).catch(() => t.fail('rejection'))
+  ss.on(true)
+  await new Promise(resolve => setImmediate(resolve))
+  t.equal(spy.callCount, 1, 'should be ready() for on(true)')
 })
 
 test('on/off events emitting', async t => {

@@ -210,11 +210,18 @@ export class StateSwitch extends EventEmitter {
     return off
   }
 
+  /**
+   * Wait the pending state to be stable.
+   */
   public async ready (
-    state: 'on' | 'off' = 'on',
-    noCross             = false,
+    state?: 'on' | 'off',
+    noCross = false,
   ): Promise<void> {
     this.log.verbose('StateSwitch', '<%s> ready(%s, noCross=%s)', this.name, state, noCross)
+
+    if (typeof state === 'undefined') {
+      state = this._onoff ? 'on' : 'off'
+    }
 
     if (state === 'on') {
       if (this._onoff === false && noCross === true) {
