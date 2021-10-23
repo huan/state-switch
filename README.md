@@ -298,6 +298,7 @@ assert (indicator.busy() === false, 'busy() should be false after await availabl
 ### master v1.0 (Oct 23, 2021)
 
 - Oct 23: Add `BusyIndicator` class
+    1. Add `BusyIndicatorInterface` and `StateSwitchInterface`
 - v0.15 (Sep 2021): Publish as ESM package.
 
 ### v0.14
