@@ -263,11 +263,42 @@ const log = Brolog.instance()
 StateSwitch.setLog(log)
 ```
 
+## `BusyIndicator`
+
+Set a busy state.
+
+```ts
+const indicator = new BusyIndicator()
+```
+
+### 1. `busy()`
+
+1. set busy or not
+1. get busy status
+
+```ts
+indicator.busy(true)
+indicator.busy(false)
+const busy = indicator.busy()
+```
+
+### 2. `available()`
+
+Return a `Promise` that will resolved after the busy state to be available. (not busy)
+
+> If the current state is not busy, it will return a `Promise` that will resolved immediately.
+
+```ts
+await indicator.available()
+assert (indicator.busy() === false, 'busy() should be false after await available()')
+```
+
 ## CHANGELOG
 
-### master v0.15
+### master v1.0 (Oct 23, 2021)
 
-Publish as ESM package.
+- Oct 23: Add `BusyIndicator` class
+- v0.15 (Sep 2021): Publish as ESM package.
 
 ### v0.14
 
