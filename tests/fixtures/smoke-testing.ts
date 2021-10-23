@@ -1,4 +1,4 @@
-import Default, {
+import {
   StateSwitch,
   VERSION,
 }               from 'state-switch'
@@ -10,10 +10,6 @@ ss.on('pending')
 ss.on(true)
 ss.off('pending')
 ss.on(true)
-
-if (Default !== StateSwitch) {
-  throw new Error('default export does not match the exported module!')
-}
 
 if (VERSION === '0.0.0') {
   throw new Error('version should be set before publishing')
