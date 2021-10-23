@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "type": "module",
   "exports": {
