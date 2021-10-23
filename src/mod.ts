@@ -10,10 +10,13 @@ import type {
 import {
   BusyIndicator,
 }                   from './busy-indicator.js'
+
+export type {
+  BusyIndicatorInterface,
+  StateSwitchInterface,
+}
 export {
   BusyIndicator,
-  BusyIndicatorInterface,
   StateSwitch,
-  StateSwitchInterface,
   VERSION,
 }

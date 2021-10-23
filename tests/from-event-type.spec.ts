@@ -11,7 +11,7 @@ import {
   fromEvent,
   firstValueFrom,
 }                 from 'rxjs'
-import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent'
+import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent.js'
 
 import { StateSwitch } from '../src/state-switch.js'
 

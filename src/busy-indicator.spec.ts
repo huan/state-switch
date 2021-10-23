@@ -11,7 +11,7 @@ test('BusyIndicator init state', async t => {
   const indicator = new BusyIndicator()
 
   t.equal(indicator.busy(), false, 'should not be not busy after init')
-  await t.resolves(() => indicator.available(), 'should be available after init')
+  await t.resolves(() => indicator.idle(), 'should be idle after init')
 })
 
 test('BusyIndicator set busy', async t => {
@@ -23,9 +23,9 @@ test('BusyIndicator set busy', async t => {
   indicator.busy(true)
   t.equal(indicator.busy(), true, 'should not be busy after set busy')
 
-  indicator.available().then(spy).catch(e => t.fail(e))
+  indicator.idle().then(spy).catch(e => t.fail(e))
   await new Promise(setImmediate)
-  t.equal(spy.callCount, 0, 'should not resolve available() when busy')
+  t.equal(spy.callCount, 0, 'should not resolve idle() when busy')
 
   sandbox.restore()
 })
@@ -37,11 +37,11 @@ test('BusyIndicator state transition', async t => {
   const indicator = new BusyIndicator()
 
   indicator.busy(true)
-  indicator.available().then(spy).catch(e => t.fail(e))
+  indicator.idle().then(spy).catch(e => t.fail(e))
   await new Promise(setImmediate)
-  t.equal(spy.callCount, 0, 'should not resolve available() when busy')
+  t.equal(spy.callCount, 0, 'should not resolve idle() when busy')
 
   indicator.busy(false)
   await new Promise(setImmediate)
-  t.equal(spy.callCount, 1, 'should resolve available() when set busy to false')
+  t.equal(spy.callCount, 1, 'should resolve idle() when set busy to false')
 })

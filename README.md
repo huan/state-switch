@@ -239,7 +239,7 @@ Check if the state is `pending`.
 `true` means there's some async operations we need to wait.
 `false` means no async on fly.
 
-### ready(expectedState='on', noCross=false): Promise<void>
+### `ready(expectedState='on', noCross=false): Promise<void>`
 
 1. `expectedState`: `'on' | 'off'`, default is `on`
 1. `noCross`: `boolean`, default is `false`
@@ -331,8 +331,8 @@ See: [RxJS - operator - fromEvent - Node.js EventEmitter: An object with addList
 
 BREAKING CHANGE: Change the `ready()` parameter to the opposite side.
 
-* Before: `ready(state, crossWait=false)`
-* AFTER: `ready(state, noCross=false`)
+- Before: `ready(state, crossWait=false)`
+- AFTER: `ready(state, noCross=false`)
 
 ### v0.3 (Apr 2018)
 
@@ -367,6 +367,6 @@ Huan LI <zixia@zixia.net> (http://linkedin.com/in/zixia)
 
 ## COPYRIGHT & LICENSE
 
-* Code & Docs 2016-2017© zixia
-* Code released under the Apache-2.0 license
-* Docs released under Creative Commons
+- Code & Docs 2016-2017© zixia
+- Code released under the Apache-2.0 license
+- Docs released under Creative Commons

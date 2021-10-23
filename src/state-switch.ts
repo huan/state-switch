@@ -230,6 +230,7 @@ export class StateSwitch extends EventEmitter {
 
       await this.onPromise
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (state === 'off') {
       if (this._onoff === true && noCross === true) {
         throw new Error('ready(off) but the state is on. call ready(off, false) to disable noCross')
@@ -252,18 +253,14 @@ export class StateSwitch extends EventEmitter {
     event: 'on' | 'off',
     listener: ((payload: true | 'pending') => void),
   ): void {
-    if (listener) {
-      super.addListener(event, listener)
-    }
+    super.addListener(event, listener)
   }
 
   removeEventListener (
     event: string,
     listener: ((payload: true | 'pending') => void),
   ): void {
-    if (listener) {
-      super.removeListener(event, listener)
-    }
+    super.removeListener(event, listener)
   }
 
 }

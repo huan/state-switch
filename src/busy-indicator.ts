@@ -33,8 +33,16 @@ class BusyIndicator {
   /**
    * Return a Promise that resolves when the busy state is off
    */
-  async available (): Promise<void> {
+  async idle (): Promise<void> {
     await this.state.ready('off')
+  }
+
+  /**
+   * @deprecated use idle() instead
+   */
+  async available (): Promise<void> {
+    console.error('available() is deprecated, use idle() instead.\n' + new Error().stack)
+    return this.idle()
   }
 
 }

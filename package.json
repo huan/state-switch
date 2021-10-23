@@ -11,18 +11,17 @@
   },
   "typings": "./dist/esm/src/mod.d.ts",
   "scripts": {
-    "clean": "rm -fr dist/* bundles/*",
-    "dist": "npm run clean && npm run build && npm run fixup",
-    "fixup": "echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
     "build": "tsc && tsc -p tsconfig.cjs.json",
-    "lint": "npm run lint:es && npm run lint:ts",
-    "rollup": "rollup -c",
-    "lint:ts": "tsc --noEmit",
-    "demo": "ts-node example/demo",
-    "test": "npm run lint && npm run test:ts",
+    "clean": "shx rm -fr dist/*",
+    "dist": "npm-run-all clean build dist:commonjs",
+    "dist:commonjs": "jq -n \"{ type: \\\"commonjs\\\" }\" > dist/cjs/package.json",
+    "lint": "npm-run-all lint:es && npm run lint:ts",
+    "lint:ts": "tsc --isolatedModules --noEmit",
+    "lint:es": "eslint --ignore-pattern fixtures/ \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "demo": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node example/demo",
+    "test": "npm-run-all lint test:ts",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
-    "test:ts": "tap --node-arg=--loader=ts-node/esm src/**/*.spec.ts tests/**/*.spec.ts",
-    "lint:es": "eslint --ignore-pattern fixtures/ 'src/**/*.ts' 'tests/**/*.ts'"
+    "test:ts": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",
@@ -41,15 +40,13 @@
   },
   "homepage": "https://github.com/huan/state-switch#readme",
   "devDependencies": {
-    "@chatie/eslint-config": "^0.13.4",
+    "@chatie/eslint-config": "^1.0.2",
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
-    "@chatie/tsconfig": "^0.16.2",
+    "@chatie/tsconfig": "^1.0.2",
     "pkg-jq": "^0.2.11",
-    "rollup": "^2.56.3",
-    "rollup-plugin-json": "^4.0.0",
-    "rxjs": "^7.3.0",
-    "tsd": "^0.17.0",
+    "rxjs": "^7.4.0",
+    "tsd": "^0.18.0",
     "tstest": "^0.7.3"
   },
   "files": [
