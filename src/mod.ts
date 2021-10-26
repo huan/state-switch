@@ -4,24 +4,26 @@ import {
 }                   from './state-switch.js'
 import type {
   BusyIndicatorInterface,
+  ServiceCtlInterface,
   StateSwitchInterface,
 }                         from './interface.js'
 import {
   BusyIndicator,
 }                         from './busy-indicator.js'
 import {
-  ServiceCtl,
-  serviceCtlMixin,
-}                         from './servcie-ctl/mod.js'
+  ServiceCtlFsm,
+  serviceCtlFsmMixin,
+}                         from './service-ctl-fsm/mod.js'
 
 export type {
   BusyIndicatorInterface,
+  ServiceCtlInterface,
   StateSwitchInterface,
 }
 export {
   BusyIndicator,
-  ServiceCtl,
-  serviceCtlMixin,
+  ServiceCtlFsm,
+  serviceCtlFsmMixin,
   StateSwitch,
   VERSION,
 }

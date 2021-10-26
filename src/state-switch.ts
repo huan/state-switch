@@ -12,7 +12,9 @@ import { EventEmitter } from 'events'
 
 import NOP from 'nop'
 
-import { VERSION } from './version.js'
+import { VERSION }    from './version.js'
+import { nopLogger }  from './nop-logger.js'
+import type { StateSwitchOptions } from './interface.js'
 
 /**
  * Using Three Valued Logic for ON/OFF State
@@ -22,10 +24,6 @@ import { VERSION } from './version.js'
  *  'pending': it's in process, not stable.
  */
 type Pending = 'pending'
-
-interface StateSwitchOptions {
-  log?: any // Brolog or Npmlog instance
-}
 
 let COUNTER = 0
 
@@ -89,12 +87,8 @@ export class StateSwitch extends EventEmitter {
       this.log = logInstance
     } else {
       /* eslint @typescript-eslint/no-unused-vars: off */
-      this.log = {
-        error   : NOP,
-        silly   : NOP,
-        verbose : NOP,
-        warn    : NOP,
-      }
+      this.log = nopLogger()
+
     }
   }
 

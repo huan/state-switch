@@ -33,7 +33,7 @@ test('ServiceCtl smoke testing', async t => {
   await ctl.stop()
   t.ok(onStopSpy.calledOnce, 'should call onStop()')
 
-  t.throws(() => ctl.reset(), 'should reject when calling reset() with an inactive service')
+  await t.resolves(() => ctl.reset(), 'should not reject when calling reset() with an inactive service')
 
   await ctl.start()
   sandbox.resetHistory()
