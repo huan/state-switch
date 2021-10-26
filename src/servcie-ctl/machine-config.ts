@@ -9,9 +9,9 @@ interface ServiceCtlEvent {
 }
 
 interface ServiceCtlAction {
-  type:
-    | 'onEntry'
-    | 'onExit'
+  type: never
+    // | 'onEntry'
+    // | 'onExit'
 }
 
 interface ServiceCtlState {
@@ -28,8 +28,8 @@ interface ServiceCtlState {
 }
 
 const inactive = {
-  entry : 'onEntry',
-  exit  : 'onExit',
+  // entry : 'onEntry',
+  // exit  : 'onExit',
   on: {
     START: 'starting',
   },
@@ -47,8 +47,8 @@ const starting = {
 } as const
 
 const active = {
-  entry : 'onEntry',
-  exit  : 'onExit',
+  // entry : 'onEntry',
+  // exit  : 'onExit',
   on: {
     RESET : 'resetting',
     STOP  : 'stopping',
@@ -78,8 +78,8 @@ const resetting = {
 } as const
 
 const canceled = {
-  entry : 'onEntry',
-  exit  : 'onExit',
+  // entry : 'onEntry',
+  // exit  : 'onExit',
   on: {
     RESET : 'resetting',
     START : 'starting',

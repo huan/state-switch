@@ -25,6 +25,7 @@ import {
 
 import { buildMachineOptions }  from './machine-options.js'
 import { waitForMachineState }  from './wait-for-selector.js'
+import { guardMachineEvent }    from './guard-machine-event.js'
 
 class EmptyClass {}
 
@@ -55,12 +56,7 @@ const serviceCtlMixin = <SuperClass extends Constructor<{}>> (superClass: SuperC
     }
 
     start (): Promise<void> {
-      if (!this._service.state.can('START')) {
-        throw new Error([
-          'ServiceCtl can not start from current state: ',
-          this._service.state.value,
-        ].join(''))
-      }
+      guardMachineEvent(this._service, 'START')
 
       const started   = waitForMachineState(this._service, 'active')
       const canceled  = waitForMachineState(this._service, 'canceled')
@@ -74,12 +70,7 @@ const serviceCtlMixin = <SuperClass extends Constructor<{}>> (superClass: SuperC
     }
 
     stop (): Promise<void> {
-      if (!this._service.state.can('STOP')) {
-        throw new Error([
-          'ServiceCtl can not stop from current state: ',
-          this._service.state.value,
-        ].join(''))
-      }
+      guardMachineEvent(this._service, 'STOP')
 
       const stopped   = waitForMachineState(this._service, 'inactive')
       const canceled  = waitForMachineState(this._service, 'canceled')
@@ -93,6 +84,8 @@ const serviceCtlMixin = <SuperClass extends Constructor<{}>> (superClass: SuperC
     }
 
     reset (): Promise<void> {
+      guardMachineEvent(this._service, 'RESET')
+
       const started   = waitForMachineState(this._service, 'active')
       const canceled  = waitForMachineState(this._service, 'canceled')
 

@@ -123,7 +123,6 @@ test('state exit before the invoked promise settle', async t => {
 
   const STOP_STATE_LIST = [
     ['xstate.init', 'start'],
-    // ['done.invoke.test.start:invocation[0]', 'resolved'],
     ['STOP', 'stop'],
   ] as const
   t.same(stateList, STOP_STATE_LIST, 'should skip the promise resolved')
