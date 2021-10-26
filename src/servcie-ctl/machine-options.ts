@@ -44,7 +44,9 @@ const buildMachineOptions = (
   }
 }
 
-export {
+export type {
   ServiceCtlServiceOptions,
+}
+export {
   buildMachineOptions,
 }
