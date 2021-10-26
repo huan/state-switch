@@ -1,3 +1,6 @@
+/**
+ * @see https://huan.github.io/state-switch/
+ */
 import { MachineConfig } from 'xstate'
 
 interface ServiceCtlEvent {

@@ -283,16 +283,46 @@ indicator.busy(false)
 const busy = indicator.busy()
 ```
 
-### 2. `available()`
+### 2. `idle()`
 
-Return a `Promise` that will resolved after the busy state to be available. (not busy)
+Return a `Promise` that will resolved after the busy state to be idle. (not busy)
 
 > If the current state is not busy, it will return a `Promise` that will resolved immediately.
 
 ```ts
-await indicator.available()
-assert (indicator.busy() === false, 'busy() should be false after await available()')
+await indicator.idle()
+assert (indicator.busy() === false, 'busy() should be false after await idle()')
 ```
+
+## ServiceCtl (ServiceCtlMixin) Class
+
+Use a Finite State Machine (FSM) to manage the state of your service.
+
+```ts
+class MyService extends ServiceCtlMixin(Service) {
+  
+  async onStart (): Promise<void> {
+    // your start code
+  }
+
+  async onStop (): Promise<void> {
+    // your stop code
+  }
+
+}
+
+const service = new MyService()
+
+await service.start() // this will call `onStart()`
+await service.stop()  // this will call `onStop()`
+
+await service.start()
+await service.reset()  // this will call `onStop()` then `onStart()`
+```
+
+Learn more about the finite state machine design pattern inside our `ServiceCtl`:
+
+[![State Switch Service Controler](https://stately.ai/registry/machines/37e4ce99-945d-49a8-8da2-1f324d04b574.png)](https://stately.ai/viz/37e4ce99-945d-49a8-8da2-1f324d04b574)
 
 ## RESOURCES
 
@@ -306,6 +336,7 @@ assert (indicator.busy() === false, 'busy() should be false after await availabl
 
 - Oct 23: Add `BusyIndicator` class
     1. Add `BusyIndicatorInterface` and `StateSwitchInterface`
+    1. Add `ServiceCtl` abstract class and `ServiceCtlMixin` mixin
 - v0.15 (Sep 2021): Publish as ESM package.
 
 ### v0.14
