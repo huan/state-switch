@@ -334,9 +334,9 @@ Learn more about the finite state machine design pattern inside our `ServiceCtl`
 
 ### master v1.0 (Oct 23, 2021)
 
+- Oct 27: Add `ServiceCtl` abstract class and `ServiceCtlMixin` mixin
 - Oct 23: Add `BusyIndicator` class
     1. Add `BusyIndicatorInterface` and `StateSwitchInterface`
-    1. Add `ServiceCtl` abstract class and `ServiceCtlMixin` mixin
 - v0.15 (Sep 2021): Publish as ESM package.
 
 ### v0.14
