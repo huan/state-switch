@@ -16,7 +16,6 @@ interface ServiceCtlServiceOptions {
   // }
 }
 
-// MachineOptions<TContext, TEvent>
 const buildMachineOptions = (
   options: ServiceCtlServiceOptions,
 ): MachineOptions<
