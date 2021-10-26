@@ -6,10 +6,13 @@ import type {
   BusyIndicatorInterface,
   StateSwitchInterface,
 }                         from './interface.js'
-
 import {
   BusyIndicator,
-}                   from './busy-indicator.js'
+}                         from './busy-indicator.js'
+import {
+  ServiceCtl,
+  serviceCtlMixin,
+}                         from './servcie-ctl/mod.js'
 
 export type {
   BusyIndicatorInterface,
@@ -17,6 +20,8 @@ export type {
 }
 export {
   BusyIndicator,
+  ServiceCtl,
+  serviceCtlMixin,
   StateSwitch,
   VERSION,
 }

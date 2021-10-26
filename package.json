@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "1.0.5",
+  "version": "1.0.14",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "type": "module",
   "exports": {
@@ -10,6 +10,10 @@
     }
   },
   "typings": "./dist/esm/src/mod.d.ts",
+  "engines": {
+    "node": ">=16",
+    "npm": ">=7"
+  },
   "scripts": {
     "build": "tsc && tsc -p tsconfig.cjs.json",
     "clean": "shx rm -fr dist/*",
@@ -44,10 +48,10 @@
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^1.0.2",
-    "pkg-jq": "^0.2.11",
-    "rxjs": "^7.4.0",
-    "tsd": "^0.18.0",
-    "tstest": "^0.7.3"
+    "tsd": "^0.18.0"
+  },
+  "peerDependencies": {
+    "rxjs": "^7.4.0"
   },
   "files": [
     "LICENSE",
@@ -58,7 +62,9 @@
     "src/"
   ],
   "dependencies": {
-    "nop": "^1.0.0"
+    "clone-class": "^1.0.2",
+    "nop": "^1.0.0",
+    "xstate": "^4.25.0"
   },
   "git": {
     "scripts": {
