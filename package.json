@@ -44,10 +44,10 @@
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^1.0.2",
-    "pkg-jq": "^0.2.11",
-    "rxjs": "^7.4.0",
-    "tsd": "^0.18.0",
-    "tstest": "^0.7.3"
+    "tsd": "^0.18.0"
+  },
+  "peerDependencies": {
+    "rxjs": "^7.4.0"
   },
   "files": [
     "LICENSE",
