@@ -294,6 +294,12 @@ await indicator.available()
 assert (indicator.busy() === false, 'busy() should be false after await available()')
 ```
 
+## RESOURCES
+
+### XState
+
+1. [An Introduction to XState in TypeScript](https://dev.to/giantmachines/an-introduction-to-xstate-in-typescript-1pdn)
+
 ## CHANGELOG
 
 ### master v1.0 (Oct 23, 2021)
@@ -368,6 +374,6 @@ Huan LI <zixia@zixia.net> (<http://linkedin.com/in/zixia>)
 
 ## COPYRIGHT & LICENSE
 
-- Code & Docs 2016-2017© zixia
+- Code & Docs 2016-now© zixia
 - Code released under the Apache-2.0 license
 - Docs released under Creative Commons

@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "type": "module",
   "exports": {
@@ -58,7 +58,9 @@
     "src/"
   ],
   "dependencies": {
-    "nop": "^1.0.0"
+    "clone-class": "^1.0.2",
+    "nop": "^1.0.0",
+    "xstate": "^4.25.0"
   },
   "git": {
     "scripts": {
