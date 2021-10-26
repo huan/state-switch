@@ -1,12 +1,6 @@
 /**
- *
- * StateSwitch for easy managing the states with async programming
- *
- * Class StateSwitch
  * Licenst: Apache-2.0
  * https://github.com/huan/state-switch
- *
- * Helper Class for Manage State Change
  */
 import { EventEmitter } from 'events'
 import { Constructor }  from 'clone-class'
@@ -70,7 +64,6 @@ const serviceCtlFsmMixin = (
 
     start (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'start()')
-
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'START')
 
       const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
@@ -86,7 +79,6 @@ const serviceCtlFsmMixin = (
 
     stop (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'stop()')
-
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'STOP')
 
       const stopped   = waitForMachineState(this._serviceCtlFsmInterpreter, 'inactive')
@@ -102,7 +94,6 @@ const serviceCtlFsmMixin = (
 
     reset (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'reset()')
-
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'RESET')
 
       const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
