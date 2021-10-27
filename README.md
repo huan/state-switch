@@ -14,21 +14,22 @@ State Switch is a Monitor/Guard for Managing Your Async Operations.
 
 `StateSwitch` can manage state transition for you, by switching from the following four states:
 
-1. `OFF`: state is off
-1. `pending ON`: state is switching from OFF to ON
-1. `ON`: state is on
-1. `pending OFF`: state is switch from ON to OFF
+1. `INACTIVE`: state is inactive
+1. `pending ACTIVE`: state is switching from INACTIVE to ACTIVE
+1. `ACTIVE`: state is active
+1. `pending INACTIVE`: state is switch from ACTIVE to INACTIVE
 
-You can set/get the state with the API, and you can also monite the state switch events by listening the 'on' and 'off' events.
+You can set/get the state with the API, and you can also monite the state switch events by listening the 'active' and 'inactive' events.
 
-There have another `read()` API return a `Promise` so that you can wait the `on` of `off` events by:
+There have another `stable()` API return a `Promise` so that you can wait the `active` of `inactive` events by:
 
 ```ts
-await state.ready('on')
-await state.ready('off')
+await state.stable('active')
+await state.stable('inactive')
+await state.stable() // wait the current state
 ```
 
-If the state is already ON when you `await state.ready('on')`, then it will resolved immediatelly.
+If the state is already ACTIVE when you `await state.stable('active')`, then it will resolved immediatelly.
 
 ## EXAMPLE
 
@@ -70,11 +71,11 @@ class MyConnection {
     /**
      * This is the only 1 Right State
      */
-    if (this.state.off() === true) {
-      this.state.on('pending')
+    if (this.state.inactive() === true) {
+      this.state.active('pending')
 
       doSlowConnect().then(() => {
-        this.state.on(true)
+        this.state.active(true)
         console.log(`> I'm now opened`)
       })
 
@@ -85,11 +86,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.off() === 'pending') {
+    if (this.state.inactive() === 'pending') {
       console.error(`> I'm closing, please wait`)
-    } else if (this.state.on() === true) {
+    } else if (this.state.active() === true) {
       console.error(`> I'm already open. no need to connect again`)
-    } else if (this.state.on() === 'pending') {
+    } else if (this.state.active() === 'pending') {
       console.error(`> I'm opening, please wait`)
     }
   }
@@ -98,11 +99,11 @@ class MyConnection {
     /**
      * This is the only one Right State
      */
-    if (this.state.on() === true) {
-      this.state.off('pending')
+    if (this.state.active() === true) {
+      this.state.inactive('pending')
 
       doSlowDisconnect().then(() => {
-        this.state.off(true)
+        this.state.inactive(true)
         console.log(`> I'm closed.`)
       })
 
@@ -113,11 +114,11 @@ class MyConnection {
     /**
      * These are the other 3 Error States
      */
-    if (this.state.on() === 'pending') {
+    if (this.state.active() === 'pending') {
       console.error(`> I'm opening, please wait`)
-    } else if (this.state.off() === true) {
+    } else if (this.state.inactive() === true) {
       console.error(`> I'm already close. no need to disconnect again`)
-    } else if (this.state.off() === 'pending') {
+    } else if (this.state.inactive() === 'pending') {
       console.error(`> I'm closing, please wait`)
     }
   }
@@ -217,43 +218,43 @@ Create a new StateSwitch instance.
 private state = new StateSwitch('MyConn')
 ```
 
-### on(): boolean | 'pending'
+### active(): boolean | 'pending'
 
-Get the state for `ON`: `true` for ON(stable), `pending` for ON(in-process). `false` for not ON.
+Get the state for `ACTIVE`: `true` for ACTIVE(stable), `pending` for ACTIVE(in-process). `false` for not ACTIVE.
 
-### on(state: true | 'pending'): void
+### active(state: true | 'pending'): void
 
-Set the state for `ON`: `true` for ON(stable), `pending` for ON(in-process).
+Set the state for `ACTIVE`: `true` for ACTIVE(stable), `pending` for ACTIVE(in-process).
 
-### off(): boolean | 'pending'
+### inactive(): boolean | 'pending'
 
-Get the state for `OFF`: `true` for OFF(stable), `pending` for OFF(in-process). `false` for not OFF.
+Get the state for `INACTIVE`: `true` for INACTIVE(stable), `pending` for INACTIVE(in-process). `false` for not INACTIVE.
 
-### off(state: true | 'pending'): void
+### inactive(state: true | 'pending'): void
 
-Set the state for `OFF`: `true` for OFF(stable), `pending` for OFF(in-process).
+Set the state for `INACTIVE`: `true` for INACTIVE(stable), `pending` for INACTIVE(in-process).
 
 ### pending(): boolean
 
 Check if the state is `pending`.
 
 `true` means there's some async operations we need to wait.
-`false` means no async on fly.
+`false` means no async active fly.
 
-### `ready(expectedState='on', noCross=false): Promise<void>`
+### `stable(expectedState?: StateType, noCross=false): Promise<void>`
 
-1. `expectedState`: `'on' | 'off'`, default is `on`
+1. `expectedState`: `'active' | 'inactive'`, default is the current state
 1. `noCross`: `boolean`, default is `false`
 
-Wait the expected state to be ready.
+Wait the expected state to be stable.
 
-If set `noCross` to `true`, then `ready()` will throw if you are wait a state from it's opposite site, for example: you can expect an `Exception` when you call `ready('on', true)` when the `on() === 'off'`.
+If set `noCross` to `true`, then `stable()` will throw if you are wait a state from it's opposite site, for example: you can expect an `Exception` be thrown out when you call `stable('active', true)` when the `inactive() === true`.
 
 ### name(): string
 
 Get the name from the constructor.
 
-### setLog(log: Brolog | Npmlog)
+### setLog(logger: Loggable)
 
 Enable log by set log to a Npmlog compatible instance.
 
@@ -294,12 +295,26 @@ await indicator.idle()
 assert (indicator.busy() === false, 'busy() should be false after await idle()')
 ```
 
-## ServiceCtl (ServiceCtlMixin) Class
+## ServiceCtl Interface
+
+```ts
+interface ServiceCtlInterface {
+  state: StateSwitchInterface
+
+  reset   : ServiceCtl['reset']
+  start   : ServiceCtl['start']
+  stop    : ServiceCtl['stop']
+}
+```
+
+### ServiceCtlFsm (ServiceCtlFsmMixin) Class
 
 Use a Finite State Machine (FSM) to manage the state of your service.
 
 ```ts
-class MyService extends ServiceCtlMixin(Service) {
+import { ServiceCtlFsm } from 'state-switch'
+
+class MyService extends ServiceCtlFsm {
 
   async onStart (): Promise<void> {
     // your start code
@@ -323,6 +338,12 @@ await service.reset()  // this will call `onStop()` then `onStart()`
 Learn more about the finite state machine design pattern inside our `ServiceCtl`:
 
 [![State Switch Service Controler](https://stately.ai/registry/machines/37e4ce99-945d-49a8-8da2-1f324d04b574.png)](https://stately.ai/viz/37e4ce99-945d-49a8-8da2-1f324d04b574)
+
+### ServiceCtl (ServiceCtlMixin) Class
+
+Implementes the same `ServiceCtlInterface`, but using a `StateSwitch` to manage the internal state.
+
+The code is originally from [Wechaty Puppet](https://github.com/wechaty/puppet/blob/e13b93335460baad0b3e5392f7eff62fef7bb645/src/puppet/puppet-abstract.ts#L139-L193), then abstracted to a class.
 
 ## RESOURCES
 
@@ -379,7 +400,7 @@ Support for using RxJS:
 ```ts
 const notPending = (state: true | 'pending') => state === true
 
-const stateOn$ = fromEvent(stateSwitch, 'on').pipe(
+const stateOn$ = fromEvent(stateSwitch, 'active').pipe(
   filter(notPending)
 )
 ```

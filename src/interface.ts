@@ -19,9 +19,6 @@ interface BusyIndicatorInterface {
 interface ServiceCtlInterface {
   state: StateSwitchInterface
 
-  onStart : ServiceCtl['onStart']
-  onStop  : ServiceCtl['onStop']
-
   reset   : ServiceCtl['reset']
   start   : ServiceCtl['start']
   stop    : ServiceCtl['stop']
