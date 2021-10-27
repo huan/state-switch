@@ -14,6 +14,10 @@ import {
   ServiceCtlFsm,
   serviceCtlFsmMixin,
 }                         from './service-ctl-fsm/mod.js'
+import {
+  ServiceCtl,
+  serviceCtlMixin,
+}                         from './service-ctl/mod.js'
 
 export type {
   BusyIndicatorInterface,
@@ -22,8 +26,10 @@ export type {
 }
 export {
   BusyIndicator,
+  ServiceCtl,
   ServiceCtlFsm,
   serviceCtlFsmMixin,
+  serviceCtlMixin,
   StateSwitch,
   VERSION,
 }
