@@ -213,7 +213,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   /**
    * @deprecate use `active()` instead. will be removed after Dec 31, 2022
    */
-  on (state: any) {
+  on (state: any): any {
     this._log.error('StateSwitch', 'on() is deprecated: use active() instead.\n%s', new Error().stack)
     return this.active(state)
   }
@@ -221,7 +221,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   /**
    * @deprecate use `inactive()` instead. will be removed after Dec 31, 2022
    */
-  off (state: any) {
+  off (state: any): any {
     this._log.error('StateSwitch', 'off() is deprecated: use inactive() instead.\n%s', new Error().stack)
     return this.inactive(state)
   }
