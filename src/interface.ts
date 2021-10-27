@@ -28,8 +28,13 @@ interface StateSwitchOptions {
   log?: Loggable
 }
 
+type EmittableConstructor = (abstract new (...args: any[]) => {
+  emit: (...args: any[]) => any;
+})
+
 export type {
   BusyIndicatorInterface,
+  EmittableConstructor,
   StateSwitchInterface,
   ServiceCtlInterface,
   StateSwitchOptions,

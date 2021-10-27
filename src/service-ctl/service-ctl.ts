@@ -9,6 +9,7 @@ import type { Loggable } from 'brolog'
 import type {
   ServiceCtlInterface,
   StateSwitchOptions,
+  EmittableConstructor,
 }                               from '../interface.js'
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
@@ -20,15 +21,12 @@ import { timeoutPromise } from './timeout-promise.js'
  * Wait from unknown state
  */
 const TIMEOUT_SECONDS = 5
-
-type Emittable = (abstract new (...args: any[]) => {
-  emit: (...args: any[]) => any;
-})
+const RESET_TIMEOUT_SECONDS = TIMEOUT_SECONDS * 3
 
 const serviceCtlMixin = (
   serviceCtlName = 'ServiceCtl',
   options? : StateSwitchOptions,
-) => <SuperClass extends Emittable> (superClass: SuperClass) => {
+) => <SuperClass extends EmittableConstructor> (superClass: SuperClass) => {
 
   abstract class ServiceCtlMixin extends superClass implements ServiceCtlInterface {
 
@@ -149,11 +147,11 @@ const serviceCtlMixin = (
        * Do not reset again if it's already resetting
        */
       if (this._serviceCtlBusyIndicator.busy()) {
-        this._serviceCtlLog.verbose(serviceCtlName, 'reset() `resetBusy` is `busy`, wait `idle()`...')
+        this._serviceCtlLog.verbose(serviceCtlName, 'reset() `resetBusy` is `busy`, wait `idle()`... (max %s seconds)', RESET_TIMEOUT_SECONDS)
         try {
           await timeoutPromise(
             this._serviceCtlBusyIndicator.idle(),
-            3 * TIMEOUT_SECONDS * 1000,
+            RESET_TIMEOUT_SECONDS * 1000,
             () => new Error('wait resetting timeout'),
           )
           this._serviceCtlLog.verbose(serviceCtlName, 'reset() `resetBusy` is `busy`, wait `idle()` done')

@@ -3,7 +3,6 @@
  * https://github.com/huan/state-switch
  */
 import { EventEmitter } from 'events'
-import type { Constructor }  from 'clone-class'
 import {
   createMachine,
   interpret,
@@ -12,11 +11,11 @@ import {
 
 import { VERSION }              from '../version.js'
 import type {
+  EmittableConstructor,
   ServiceCtlInterface,
   StateSwitchInterface,
   StateSwitchOptions,
 }                             from '../interface.js'
-// import { nopLogger }            from '../nop-logger.js'
 
 import type {
   ServiceCtlContext,
@@ -37,7 +36,7 @@ import { StateSwitch } from '../state-switch.js'
 const serviceCtlFsmMixin = (
   serviceCtlName = 'ServiceCtlFsm',
   options? : StateSwitchOptions,
-) => <SuperClass extends Constructor<{ emit: Function }>> (superClass: SuperClass) => {
+) => <SuperClass extends EmittableConstructor> (superClass: SuperClass) => {
 
   abstract class ServiceCtlFsmMixin extends superClass implements ServiceCtlInterface {
 

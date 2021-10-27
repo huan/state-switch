@@ -61,7 +61,6 @@
   ],
   "dependencies": {
     "@pipeletteio/nop": "^1.0.0",
-    "clone-class": "^1.0.2",
     "xstate": "^4.25.0"
   },
   "git": {
