@@ -7,7 +7,7 @@ import {
   filter,
   // eslint-disable-next-line import/extensions
 }                 from 'rxjs/operators'
-import {
+import type {
   State,
   Interpreter,
   StateSchema,

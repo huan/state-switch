@@ -11,7 +11,10 @@
 import { EventEmitter } from 'events'
 import type { Loggable } from 'brolog'
 import { getLoggable }  from 'brolog'
-import NOP              from 'nop'
+import {
+  nop,
+  isNop,
+}                       from '@pipeletteio/nop'
 
 import {
   VERSION,
@@ -69,12 +72,14 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
     /**
      * for ready()
      */
-    this._inactiveResolver = NOP
+    this._activeResolver   = nop
+    this._inactiveResolver = nop
+
     this._activePromise = new Promise<void>(resolve => {
       this._activeResolver = resolve
     })
-
     this._inactivePromise = Promise.resolve()
+
   }
 
   name (): string {
@@ -128,14 +133,14 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       this.emit('on', state)
 
       /**
-        * for ready()
+        * for stable()
         */
-      if (this._inactiveResolver === NOP) {
+      if (isNop(this._inactiveResolver)) {
         this._inactivePromise = new Promise<void>(resolve => (this._inactiveResolver = resolve))
       }
-      if (state === true && this._activeResolver !== NOP) {
+      if (state === true && !isNop(this._activeResolver)) {
         this._activeResolver()
-        this._activeResolver = NOP
+        this._activeResolver = nop
       }
 
       return
@@ -187,14 +192,14 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       this.emit('off', state)
 
       /**
-        * for ready()
+        * for stable()
         */
-      if (this._activeResolver === NOP) {
+      if (isNop(this._activeResolver)) {
         this._activePromise = new Promise<void>(resolve => (this._activeResolver = resolve))
       }
-      if (state === true && this._inactiveResolver !== NOP) {
+      if (state === true && !isNop(this._inactiveResolver)) {
         this._inactiveResolver()
-        this._inactiveResolver = NOP
+        this._inactiveResolver = nop
       }
 
       return
@@ -213,7 +218,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   /**
    * @deprecate use `active()` instead. will be removed after Dec 31, 2022
    */
-  on (state: any): any {
+  override on (state: any): any {
     this._log.error('StateSwitch', 'on() is deprecated: use active() instead.\n%s', new Error().stack)
     return this.active(state)
   }
@@ -221,7 +226,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   /**
    * @deprecate use `inactive()` instead. will be removed after Dec 31, 2022
    */
-  off (state: any): any {
+  override off (state: any): any {
     this._log.error('StateSwitch', 'off() is deprecated: use inactive() instead.\n%s', new Error().stack)
     return this.inactive(state)
   }

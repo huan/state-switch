@@ -1,7 +1,7 @@
 /**
  * @see https://huan.github.io/state-switch/
  */
-import { MachineConfig } from 'xstate'
+import type { MachineConfig } from 'xstate'
 
 interface ServiceCtlEvent {
   type:

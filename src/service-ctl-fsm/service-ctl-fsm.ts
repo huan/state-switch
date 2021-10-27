@@ -3,7 +3,7 @@
  * https://github.com/huan/state-switch
  */
 import { EventEmitter } from 'events'
-import { Constructor }  from 'clone-class'
+import type { Constructor }  from 'clone-class'
 import {
   createMachine,
   interpret,
@@ -11,18 +11,20 @@ import {
 }                       from 'xstate'
 
 import { VERSION }              from '../version.js'
-import {
+import type {
   ServiceCtlInterface,
   StateSwitchInterface,
   StateSwitchOptions,
 }                             from '../interface.js'
 // import { nopLogger }            from '../nop-logger.js'
 
-import {
-  config,
+import type {
   ServiceCtlContext,
   ServiceCtlEvent,
   ServiceCtlState,
+}                     from './machine-config.js'
+import {
+  config,
 }                     from './machine-config.js'
 
 import { buildMachineOptions }  from './machine-options.js'

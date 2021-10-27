@@ -11,7 +11,7 @@ import {
   fromEvent,
   firstValueFrom,
 }                 from 'rxjs'
-import { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent.js'
+import type { HasEventTargetAddRemove } from 'rxjs/internal/observable/fromEvent.js'
 
 import { StateSwitch } from '../src/state-switch.js'
 
@@ -24,7 +24,7 @@ test('StateSwitch satisfy DOM EventTarget: HasEventTargetAddRemove', async t => 
   t.pass('expectAssignable match listener argument typings')
 })
 
-test('RxJS: fromEvent type inference', async (t) => {
+test('RxJS: fromEvent type inference', async t => {
   const state = new StateSwitch()
   const event$ = fromEvent(state, 'active')
   expectType<Observable<true | 'pending'>>(event$)
@@ -34,6 +34,8 @@ test('RxJS: fromEvent type inference', async (t) => {
 
   const result = await future
   expectType<true | 'pending'>(result)
+
+  t.pass('RxJS typing ok')
 })
 
 test('RxJS: fromEvent stream for the second value', async (t) => {

@@ -3,11 +3,10 @@
  * https://github.com/huan/state-switch
  */
 import { EventEmitter } from 'events'
-import { Constructor }  from 'clone-class'
 import { getLoggable }  from 'brolog'
 import type { Loggable } from 'brolog'
 
-import {
+import type {
   ServiceCtlInterface,
   StateSwitchOptions,
 }                               from '../interface.js'
@@ -22,10 +21,14 @@ import { timeoutPromise } from './timeout-promise.js'
  */
 const TIMEOUT_SECONDS = 5
 
+type Emittable = (abstract new (...args: any[]) => {
+  emit: (...args: any[]) => any;
+})
+
 const serviceCtlMixin = (
   serviceCtlName = 'ServiceCtl',
   options? : StateSwitchOptions,
-) => <SuperClass extends Constructor<{ emit: EventEmitter['emit'] }>> (superClass: SuperClass) => {
+) => <SuperClass extends Emittable> (superClass: SuperClass) => {
 
   abstract class ServiceCtlMixin extends superClass implements ServiceCtlInterface {
 

@@ -1,6 +1,6 @@
-import { MachineOptions } from 'xstate'
+import type { MachineOptions } from 'xstate'
 
-import {
+import type {
   ServiceCtlContext,
   ServiceCtlEvent,
 }                     from './machine-config.js'
