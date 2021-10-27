@@ -22,7 +22,7 @@ import {
 import type {
   StateSwitchInterface,
   StateSwitchOptions,
-}                       from './interface.js'
+}                       from './interfaces.js'
 
 /**
  * Using Three Valued Logic for ON/OFF State

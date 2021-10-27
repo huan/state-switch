@@ -5,7 +5,12 @@ import {
   sinon,
 }             from 'tstest'
 
-import { ServiceCtlFsm } from './service-ctl-fsm.js'
+import { EventEmitter } from 'events'
+
+import {
+  ServiceCtlFsm,
+  serviceCtlFsmMixin,
+}                     from './service-ctl-fsm.js'
 
 test('ServiceCtlFsm smoke testing', async t => {
   const sandbox = sinon.createSandbox()
@@ -40,4 +45,62 @@ test('ServiceCtlFsm smoke testing', async t => {
   await t.resolves(() => ctl.reset(), 'should be able to reset with an active service')
   t.ok(onStartSpy.calledOnce, 'should call onStart() via reset()')
   t.ok(onStopSpy.calledOnce, 'should call onStop() via reset()')
+})
+
+test('serviceCtlFsmMixin()', async t => {
+  const sandbox = sinon.createSandbox()
+
+  const childOnStartSpy = sandbox.spy()
+  const childOnStopSpy  = sandbox.spy()
+
+  const parentStartSpy  = sandbox.spy()
+  const parentStopSpy   = sandbox.spy()
+
+  class ServiceableBase extends EventEmitter {
+
+    start () {
+      parentStartSpy()
+    }
+
+    stop () {
+      parentStopSpy()
+    }
+
+  }
+
+  const mixinBase = serviceCtlFsmMixin()(ServiceableBase)
+
+  class ServiceCtlFsmImpl extends mixinBase {
+
+    async onStart () {
+      childOnStartSpy()
+    }
+
+    async onStop () {
+      childOnStopSpy()
+    }
+
+  }
+
+  const ctl = new ServiceCtlFsmImpl()
+
+  await ctl.start()
+  t.ok(childOnStartSpy.calledOnce, 'should call onStart()')
+  t.ok(parentStartSpy.calledOnce, 'should call parent start()')
+
+  t.ok(childOnStopSpy.notCalled, 'should not call onStop()')
+
+  await ctl.stop()
+  t.ok(childOnStopSpy.calledOnce, 'should call onStop()')
+  t.ok(parentStopSpy.calledOnce, 'should call parent stop()')
+
+  t.throws(() => ctl.reset(), 'should reject when calling reset() with an inactive service')
+
+  await ctl.start()
+  sandbox.resetHistory()
+  await t.resolves(() => ctl.reset(), 'should be able to reset with an active service')
+  t.ok(childOnStartSpy.calledOnce, 'should call onStart() via reset()')
+  t.ok(childOnStopSpy.calledOnce, 'should call onStop() via reset()')
+  t.ok(parentStartSpy.calledOnce, 'should call parent start() via reset()')
+  t.ok(parentStopSpy.calledOnce, 'should call parent stop() via reset()')
 })

@@ -2,7 +2,6 @@
  * Licenst: Apache-2.0
  * https://github.com/huan/state-switch
  */
-import { EventEmitter } from 'events'
 import {
   createMachine,
   interpret,
@@ -10,12 +9,13 @@ import {
 }                       from 'xstate'
 
 import { VERSION }              from '../version.js'
-import type {
-  EmittableConstructor,
+import {
+  EmptyServiceableImpl,
+  ServiceableAbstract,
   ServiceCtlInterface,
   StateSwitchInterface,
   StateSwitchOptions,
-}                             from '../interface.js'
+}                             from '../interfaces.js'
 
 import type {
   ServiceCtlContext,
@@ -36,7 +36,7 @@ import { StateSwitch } from '../state-switch.js'
 const serviceCtlFsmMixin = (
   serviceCtlName = 'ServiceCtlFsm',
   options? : StateSwitchOptions,
-) => <SuperClass extends EmittableConstructor> (superClass: SuperClass) => {
+) => <SuperClass extends typeof ServiceableAbstract> (superClass: SuperClass) => {
 
   abstract class ServiceCtlFsmMixin extends superClass implements ServiceCtlInterface {
 
@@ -64,8 +64,14 @@ const serviceCtlFsmMixin = (
 
       const machineOptions = buildMachineOptions({
         // reset: () => has been internally implemented by calling stop() and start()
-        start : () => this.onStart(),
-        stop  : () => this.onStop(),
+        start : async () => {
+          await super.start()
+          await this.onStart()
+        },
+        stop  : async () => {
+          await this.onStop()
+          await super.stop()
+        },
       })
       const machine = createMachine(config, machineOptions)
 
@@ -73,7 +79,7 @@ const serviceCtlFsmMixin = (
       this._serviceCtlFsmInterpreter.start()
     }
 
-    start (): Promise<void> {
+    override start (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'start()')
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'START')
 
@@ -89,7 +95,7 @@ const serviceCtlFsmMixin = (
       ])
     }
 
-    stop (): Promise<void> {
+    override stop (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'stop()')
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'STOP')
 
@@ -131,7 +137,7 @@ const serviceCtlFsmMixin = (
   return ServiceCtlFsmMixin
 }
 
-abstract class ServiceCtlFsm extends serviceCtlFsmMixin()(EventEmitter) {}
+abstract class ServiceCtlFsm extends serviceCtlFsmMixin()(EmptyServiceableImpl) {}
 
 export {
   ServiceCtlFsm,

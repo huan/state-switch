@@ -52,7 +52,7 @@
     "typed-emitter": "^1.4.0"
   },
   "peerDependencies": {
-    "brolog": "^1.13.3",
+    "brolog": "^1.13.6",
     "rxjs": "^7.4.0"
   },
   "files": [

@@ -2,15 +2,15 @@
  * Licenst: Apache-2.0
  * https://github.com/huan/state-switch
  */
-import { EventEmitter } from 'events'
 import { getLoggable }  from 'brolog'
 import type { Loggable } from 'brolog'
 
-import type {
+import {
   ServiceCtlInterface,
   StateSwitchOptions,
-  EmittableConstructor,
-}                               from '../interface.js'
+  ServiceableAbstract,
+  EmptyServiceableImpl,
+}                               from '../interfaces.js'
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
 import { VERSION }              from '../version.js'
@@ -26,7 +26,7 @@ const RESET_TIMEOUT_SECONDS = TIMEOUT_SECONDS * 3
 const serviceCtlMixin = (
   serviceCtlName = 'ServiceCtl',
   options? : StateSwitchOptions,
-) => <SuperClass extends EmittableConstructor> (superClass: SuperClass) => {
+) => <SuperClass extends typeof ServiceableAbstract> (superClass: SuperClass) => {
 
   abstract class ServiceCtlMixin extends superClass implements ServiceCtlInterface {
 
@@ -34,19 +34,19 @@ const serviceCtlMixin = (
 
     state: StateSwitch
 
-    _serviceCtlBusyIndicator : BusyIndicator
-    _serviceCtlLog           : Loggable
+    _serviceCtlResettingIndicator : BusyIndicator
+    _serviceCtlLog                : Loggable
 
     constructor (...args: any[]) {
       super(...args)
 
-      this.state   = new StateSwitch(serviceCtlName, options)
-      this._serviceCtlBusyIndicator = new BusyIndicator(serviceCtlName, options)
+      this.state = new StateSwitch(serviceCtlName, options)
+      this._serviceCtlResettingIndicator = new BusyIndicator(serviceCtlName, options)
 
       this._serviceCtlLog = getLoggable(options?.log)
     }
 
-    async start () : Promise<void> {
+    override async start () : Promise<void> {
       if (this.state.active()) {
         this._serviceCtlLog.warn(serviceCtlName, 'start() found that is starting/statred...')
         await this.state.stable('active')
@@ -73,6 +73,14 @@ const serviceCtlMixin = (
       this.state.active('pending')
 
       try {
+        /**
+         * Parent start()
+         */
+        await super.start()
+
+        /**
+         * Child onStart()
+         */
         this._serviceCtlLog.verbose(serviceCtlName, 'start() this.onStart() ...')
         await this.onStart()
         this._serviceCtlLog.verbose(serviceCtlName, 'start() this.onStart() done')
@@ -89,9 +97,12 @@ const serviceCtlMixin = (
       }
     }
 
-    async stop (): Promise<void> {
+    override async stop (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'stop()')
 
+      /**
+       * Already in inactive/stop state: return directly
+       */
       if (this.state.inactive()) {
         this._serviceCtlLog.warn(serviceCtlName, 'stop() found that is stopping/stopped...')
         await this.state.stable('inactive')
@@ -99,6 +110,9 @@ const serviceCtlMixin = (
         return
       }
 
+      /**
+       * activing/starting: wait it to be finished first (with timeout)
+       */
       if (this.state.active() === 'pending') {
         this._serviceCtlLog.warn(serviceCtlName, 'stop() found that is starting...')
 
@@ -117,10 +131,23 @@ const serviceCtlMixin = (
 
       this.state.inactive('pending')
 
+      /**
+       * Child onStop()
+       */
       try {
         this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.onStop() ...')
         await this.onStop()
         this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.onStop() done')
+
+      } catch (e) {
+        this.emit('error', e)
+      }
+
+      /**
+       * Parent stop()
+       */
+      try {
+        await super.stop()
       } catch (e) {
         this.emit('error', e)
       }
@@ -146,11 +173,11 @@ const serviceCtlMixin = (
       /**
        * Do not reset again if it's already resetting
        */
-      if (this._serviceCtlBusyIndicator.busy()) {
+      if (this._serviceCtlResettingIndicator.busy()) {
         this._serviceCtlLog.verbose(serviceCtlName, 'reset() `resetBusy` is `busy`, wait `idle()`... (max %s seconds)', RESET_TIMEOUT_SECONDS)
         try {
           await timeoutPromise(
-            this._serviceCtlBusyIndicator.idle(),
+            this._serviceCtlResettingIndicator.idle(),
             RESET_TIMEOUT_SECONDS * 1000,
             () => new Error('wait resetting timeout'),
           )
@@ -164,36 +191,38 @@ const serviceCtlMixin = (
         }
       }
 
-      this._serviceCtlBusyIndicator.busy(true)
+      this._serviceCtlResettingIndicator.busy(true)
 
+      /**
+       * If the Service is starting/stopping, wait for it
+       * The state will be `'active'` after await `stable()`
+       */
       try {
-        /**
-         * If the Service is starting/stopping, wait for it
-         * The state will be `'active'` after await `stable()`
-         */
-        try {
-          this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() ...')
-          await timeoutPromise(
-            this.state.stable(),
-            3 * TIMEOUT_SECONDS * 1000,
-            () => new Error('state.ready() timeout'),
-          )
-          this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() done')
-        } catch (e) {
-          this.emit('error', e)
-          this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() timeout')
-        }
+        this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() ...')
+        await timeoutPromise(
+          this.state.stable(),
+          3 * TIMEOUT_SECONDS * 1000,
+          () => new Error('state.ready() timeout'),
+        )
+        this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() done')
+      } catch (e) {
+        this.emit('error', e)
+        this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() timeout')
+      }
 
+      /**
+       * Do the stop() & start() job
+       */
+      try {
         await this.stop()
         await this.start()
-
       } catch (e) {
         this.emit('error', e)
         this._serviceCtlLog.warn(serviceCtlName, 'reset() rejection: %s', (e as Error).message)
 
       } finally {
         this._serviceCtlLog.verbose(serviceCtlName, 'reset() done')
-        this._serviceCtlBusyIndicator.busy(false)
+        this._serviceCtlResettingIndicator.busy(false)
       }
 
     }
@@ -206,7 +235,7 @@ const serviceCtlMixin = (
   return ServiceCtlMixin
 }
 
-abstract class ServiceCtl extends serviceCtlMixin()(EventEmitter) {}
+abstract class ServiceCtl extends serviceCtlMixin()(EmptyServiceableImpl) {}
 
 export {
   ServiceCtl,

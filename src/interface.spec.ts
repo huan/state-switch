@@ -2,7 +2,7 @@
 import type {
   StateSwitchInterface,
   BusyIndicatorInterface,
-}                         from './interface.js'
+}                         from './interfaces.js'
 import { StateSwitch } from './state-switch.js'
 
 import { test } from 'tstest'

@@ -6,7 +6,7 @@ import type {
   BusyIndicatorInterface,
   ServiceCtlInterface,
   StateSwitchInterface,
-}                         from './interface.js'
+}                         from './interfaces.js'
 import {
   BusyIndicator,
 }                         from './busy-indicator.js'
