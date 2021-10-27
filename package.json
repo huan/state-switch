@@ -48,7 +48,8 @@
     "@chatie/git-scripts": "^0.6.2",
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^1.0.2",
-    "tsd": "^0.18.0"
+    "tsd": "^0.18.0",
+    "typed-emitter": "^1.4.0"
   },
   "peerDependencies": {
     "brolog": "^1.13.3",

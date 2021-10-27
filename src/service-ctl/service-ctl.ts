@@ -25,7 +25,7 @@ const TIMEOUT_SECONDS = 5
 const serviceCtlMixin = (
   serviceCtlName = 'ServiceCtl',
   options? : StateSwitchOptions,
-) => <SuperClass extends Constructor<{ emit: Function }>> (superClass: SuperClass) => {
+) => <SuperClass extends Constructor<{ emit: EventEmitter['emit'] }>> (superClass: SuperClass) => {
 
   abstract class ServiceCtlMixin extends superClass implements ServiceCtlInterface {
 

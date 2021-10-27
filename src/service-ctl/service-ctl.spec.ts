@@ -3,14 +3,22 @@
 import {
   test,
   sinon,
-}             from 'tstest'
+  AssertEqual,
+}               from 'tstest'
+import { EventEmitter } from 'events'
+import TypedEventEmitter from 'typed-emitter'
+import { log } from 'brolog'
 
-import { ServiceCtl } from './service-ctl.js'
+import {
+  ServiceCtl,
+  serviceCtlMixin,
+}                     from './service-ctl.js'
 
 test('ServiceCtl smoke testing', async t => {
   const sandbox = sinon.createSandbox()
+
   const onStartSpy = sandbox.spy()
-  const onStopSpy = sandbox.spy()
+  const onStopSpy  = sandbox.spy()
 
   class ServiceCtlImpl extends ServiceCtl {
 
@@ -25,6 +33,57 @@ test('ServiceCtl smoke testing', async t => {
   }
 
   const ctl = new ServiceCtlImpl()
+
+  await ctl.start()
+  t.ok(onStartSpy.calledOnce, 'should call onStart()')
+  t.ok(onStopSpy.notCalled, 'should not call onStop()')
+
+  await ctl.stop()
+  t.ok(onStopSpy.calledOnce, 'should call onStop()')
+
+  await t.resolves(() => ctl.reset(), 'should not reject when calling reset() with an inactive service')
+
+  await ctl.start()
+  sandbox.resetHistory()
+  await t.resolves(() => ctl.reset(), 'should be able to reset with an active service')
+  t.ok(onStartSpy.calledOnce, 'should call onStart() via reset()')
+  t.ok(onStopSpy.calledOnce, 'should call onStop() via reset()')
+})
+
+test('ServiceCtlMixin smoke testing', async t => {
+  const sandbox = sinon.createSandbox()
+
+  const onStartSpy = sandbox.spy()
+  const onStopSpy  = sandbox.spy()
+
+  type TestListener = (data: string) => void
+
+  const MyEventEmitter = EventEmitter as new () => TypedEventEmitter<{
+    test: TestListener
+  }>
+
+  const mixinBase = serviceCtlMixin('MixinTest', { log })(MyEventEmitter)
+
+  class ServiceCtlImpl extends mixinBase {
+
+    async onStart () {
+      onStartSpy()
+      this.emit('test', 42)
+    }
+
+    async onStop () {
+      onStopSpy()
+      this.emit('test', 'on-stop')
+    }
+
+  }
+
+  const ctl = new ServiceCtlImpl()
+
+  ctl.on('test', data => {
+    const typeTest: AssertEqual<typeof data, string> = true
+    t.ok(typeTest, 'test event should emit string type payload')
+  })
 
   await ctl.start()
   t.ok(onStartSpy.calledOnce, 'should call onStart()')
