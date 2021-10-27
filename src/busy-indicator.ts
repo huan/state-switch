@@ -20,13 +20,13 @@ class BusyIndicator {
 
   busy (b?: boolean): void | boolean {
     if (typeof b === 'undefined') {
-      return !!(this.state.on())
+      return !!(this.state.active())
     }
 
     if (b) {
-      this.state.on(true)
+      this.state.active(true)
     } else {
-      this.state.off(true)
+      this.state.inactive(true)
     }
   }
 
@@ -34,7 +34,7 @@ class BusyIndicator {
    * Return a Promise that resolves when the busy state is off
    */
   async idle (): Promise<void> {
-    await this.state.ready('off')
+    await this.state.stable('inactive')
   }
 
   /**

@@ -9,12 +9,17 @@
  * Helper Class for Manage State Change
  */
 import { EventEmitter } from 'events'
+import type { Loggable } from 'brolog'
+import { getLoggable }  from 'brolog'
+import NOP              from 'nop'
 
-import NOP from 'nop'
-
-import { VERSION }    from './version.js'
-import { nopLogger }  from './nop-logger.js'
-import type { StateSwitchOptions } from './interface.js'
+import {
+  VERSION,
+}                       from './version.js'
+import type {
+  StateSwitchInterface,
+  StateSwitchOptions,
+}                       from './interface.js'
 
 /**
  * Using Three Valued Logic for ON/OFF State
@@ -24,114 +29,113 @@ import type { StateSwitchOptions } from './interface.js'
  *  'pending': it's in process, not stable.
  */
 type Pending = 'pending'
+type StateType =
+  | 'active'
+  | 'inactive'
+  // `on` & `off` are deprecated. use `active` and `inactive` instead
+  | 'on'
+  | 'off'
 
 let COUNTER = 0
 
-export class StateSwitch extends EventEmitter {
+export class StateSwitch extends EventEmitter implements StateSwitchInterface {
 
-  private log: any
+  protected _log: Loggable
 
-  private onPromise:    Promise<void>
-  private offPromise:   Promise<void>
+  protected _activePromise:   Promise<void>
+  protected _inactivePromise: Promise<void>
 
-  private onResolver:   Function
-  private offResolver:  Function
+  protected _activeResolver:    Function
+  protected _inactiveResolver:  Function
 
-  private _onoff   : boolean
-  private _pending : boolean
-
-  /**
-   * does the state is not stable(in process)?
-   */
-  public get pending () {
-    this.log.silly('StateSwitch', '<%s> pending() is %s', this.name, this._pending)
-    return this._pending
-  }
+  protected _isActive   : boolean
+  protected _isPending  : boolean
 
   constructor (
-    public readonly name = `#${COUNTER++}`,
-    public readonly options: StateSwitchOptions = {},
+    protected readonly _name = `StateSwitch#${COUNTER++}`,
+    protected readonly _options: StateSwitchOptions = {},
   ) {
     super()
 
-    if (options.log) {
-      this.setLog(options.log)
-    } else {
-      this.setLog(null)
-    }
-    this.log.verbose('StateSwitch', 'constructor(%s, "%s")',
-      name,
-      JSON.stringify(options),
+    this._log = getLoggable(_options.log)
+    this._log.verbose('StateSwitch', 'constructor(%s, "%s")',
+      _name,
+      JSON.stringify(_options),
     )
 
-    this._onoff   = false
-    this._pending = false
+    this._isActive   = false
+    this._isPending = false
 
     /**
      * for ready()
      */
-    this.offPromise = Promise.resolve()
-    this.onPromise  = new Promise<void>(resolve => {
-      this.onResolver = resolve
+    this._inactiveResolver = NOP
+    this._activePromise = new Promise<void>(resolve => {
+      this._activeResolver = resolve
     })
-    this.offResolver = NOP
 
+    this._inactivePromise = Promise.resolve()
   }
 
-  public version (): string {
+  name (): string {
+    return this._name
+  }
+
+  version (): string {
     return VERSION
   }
 
-  public setLog (logInstance?: any) {
-    if (logInstance) {
-      this.log = logInstance
-    } else {
-      /* eslint @typescript-eslint/no-unused-vars: off */
-      this.log = nopLogger()
-
-    }
+  /**
+   * @deprecated will be removed after Dec 31, 2022
+   */
+  setLog (logInstance?: any) {
+    this._log = getLoggable(logInstance)
   }
 
   /**
    * Get the current ON state (3VL).
    */
-  public on (): boolean | Pending
+  active (): boolean | Pending
   /**
    * Turn on the current state.
    * @param state
    *  `Pending` means we entered the turn on async process
    *  `true` means we have finished the turn on async process.
    */
-  public on (state: true | Pending): void
+  active (state: true | Pending): void
 
-  public on (state: never): never
-  public on (
+  active (state: never): never
+  active (
     state?: true | Pending,
   ): void | boolean | Pending {
     /**
      * Set
      */
     if (state) {
-      this.log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
-        this.name,
+      this._log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
+        this._name,
         state,
-        this.on(),
+        this.active(),
       )
 
-      this._onoff = true
-      this._pending = (state === 'pending')
+      this._isActive = true
+      this._isPending = (state === 'pending')
 
+      this.emit('active', state)
+      /**
+       * @deprecated `on` event will be removed after Dec 31, 2022
+       */
       this.emit('on', state)
 
       /**
         * for ready()
         */
-      if (this.offResolver === NOP) {
-        this.offPromise = new Promise<void>(resolve => (this.offResolver = resolve))
+      if (this._inactiveResolver === NOP) {
+        this._inactivePromise = new Promise<void>(resolve => (this._inactiveResolver = resolve))
       }
-      if (state === true && this.onResolver !== NOP) {
-        this.onResolver()
-        this.onResolver = NOP
+      if (state === true && this._activeResolver !== NOP) {
+        this._activeResolver()
+        this._activeResolver = NOP
       }
 
       return
@@ -140,19 +144,17 @@ export class StateSwitch extends EventEmitter {
     /**
      * Get
      */
-    const on = this._onoff
-      ? this._pending
-        ? 'pending'
-        : true
+    const activeState = this._isActive
+      ? this._isPending ? 'pending' : true
       : false
-    this.log.silly('StateSwitch', '<%s> on() is %s', this.name, on)
-    return on
+    this._log.silly('StateSwitch', '<%s> on() is %s', this._name, activeState)
+    return activeState
   }
 
   /**
    * Get the current OFF state (3VL).
    */
-  public off (): boolean | Pending
+  inactive (): boolean | Pending
 
   /**
    * Turn off the current state.
@@ -160,35 +162,39 @@ export class StateSwitch extends EventEmitter {
    *  `Pending` means we entered the turn off async process
    *  `true` means we have finished the turn off async process.
    */
-  public off (state: true | Pending): void
+  inactive (state: true | Pending): void
 
-  public off (state: never): never
-  public off (
+  inactive (state: never): never
+  inactive (
     state?: true | Pending,
   ): void | boolean | Pending {
     /**
      * Set
      */
     if (state) {
-      this.log.verbose('StateSwitch', '<%s> off(%s) <- (%s)',
-        this.name,
+      this._log.verbose('StateSwitch', '<%s> off(%s) <- (%s)',
+        this._name,
         state,
-        this.off(),
+        this.inactive(),
       )
-      this._onoff      = false
-      this._pending = (state === 'pending')
+      this._isActive  = false
+      this._isPending = (state === 'pending')
 
+      this.emit('inactive', state)
+      /**
+       * @deprecated `off` event will be removed after Dec 31, 2022
+       */
       this.emit('off', state)
 
       /**
         * for ready()
         */
-      if (this.onResolver === NOP) {
-        this.onPromise = new Promise<void>(resolve => (this.onResolver = resolve))
+      if (this._activeResolver === NOP) {
+        this._activePromise = new Promise<void>(resolve => (this._activeResolver = resolve))
       }
-      if (state === true && this.offResolver !== NOP) {
-        this.offResolver()
-        this.offResolver = NOP
+      if (state === true && this._inactiveResolver !== NOP) {
+        this._inactiveResolver()
+        this._inactiveResolver = NOP
       }
 
       return
@@ -197,54 +203,86 @@ export class StateSwitch extends EventEmitter {
     /**
      * Get
      */
-    const off = !this._onoff
-      ? this._pending ? 'pending' : true
+    const inactiveState = !this._isActive
+      ? this._isPending ? 'pending' : true
       : false
-    this.log.silly('StateSwitch', '<%s> off() is %s', this.name, off)
-    return off
+    this._log.silly('StateSwitch', '<%s> off() is %s', this._name, inactiveState)
+    return inactiveState
+  }
+
+  /**
+   * @deprecate use `active()` instead. will be removed after Dec 31, 2022
+   */
+  on (state: any) {
+    this._log.error('StateSwitch', 'on() is deprecated: use active() instead.\n%s', new Error().stack)
+    return this.active(state)
+  }
+
+  /**
+   * @deprecate use `inactive()` instead. will be removed after Dec 31, 2022
+   */
+  off (state: any) {
+    this._log.error('StateSwitch', 'off() is deprecated: use inactive() instead.\n%s', new Error().stack)
+    return this.inactive(state)
+  }
+
+  /**
+   * does the state is not stable(in process)?
+   */
+  pending () {
+    this._log.silly('StateSwitch', '<%s> pending() is %s', this._name, this._isPending)
+    return this._isPending
   }
 
   /**
    * Wait the pending state to be stable.
    */
-  public async ready (
-    state?: 'on' | 'off',
+  async stable (
+    state?: StateType,
     noCross = false,
   ): Promise<void> {
-    this.log.verbose('StateSwitch', '<%s> ready(%s, noCross=%s)', this.name, state, noCross)
+    this._log.verbose('StateSwitch', '<%s> stable(%s, noCross=%s)', this._name, state, noCross)
 
     if (typeof state === 'undefined') {
-      state = this._onoff ? 'on' : 'off'
+      state = this._isActive ? 'active' : 'inactive'
     }
 
-    if (state === 'on') {
-      if (this._onoff === false && noCross === true) {
-        throw new Error('ready(on) but the state is off. call ready(on, false) to disable noCross')
+    if (state === 'active' || state === 'on') {
+      if (this._isActive === false && noCross === true) {
+        throw new Error('stable(active) but the state is inactive. call stable(active, false) to disable noCross')
       }
 
-      await this.onPromise
+      await this._activePromise
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (state === 'off') {
-      if (this._onoff === true && noCross === true) {
-        throw new Error('ready(off) but the state is on. call ready(off, false) to disable noCross')
+    } else if (state === 'inactive' || state === 'off') {
+      if (this._isActive === true && noCross === true) {
+        throw new Error('stable(inactive) but the state is active. call stable(inactive, false) to disable noCross')
       }
-      await this.offPromise
+      await this._inactivePromise
 
     } else {
       throw new Error(`should not go here. ${state} should be of type 'never'`)
     }
 
-    this.log.silly('StateSwitch', '<%s> ready(%s, %s) resolved.', this.name, state, noCross)
+    this._log.silly('StateSwitch', '<%s> stable(%s, %s) resolved.', this._name, state, noCross)
 
+  }
+
+  /**
+   * @deprecated use `stable()` instead. will be removed after Dec 31, 2022
+   */
+  ready () {
+    this._log.error('StateSwitch', 'ready() is deprecated: use stable() instead.\n%s', new Error().stack)
+    return this.stable()
   }
 
   /**
    * Huan(202105): To make RxJS fromEvent happy: type inferencing
    *  https://github.com/ReactiveX/rxjs/blob/92fbdda7c06561bc73dae3c14de3fc7aff92bbd4/src/internal/observable/fromEvent.ts#L39-L50
    */
-  public addEventListener (
-    event: 'on' | 'off',
+  addEventListener (
+    event: StateType,
     listener: ((payload: true | 'pending') => void),
   ): void {
     super.addListener(event, listener)

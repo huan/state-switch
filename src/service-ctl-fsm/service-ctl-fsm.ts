@@ -13,6 +13,7 @@ import {
 import { VERSION }              from '../version.js'
 import {
   ServiceCtlInterface,
+  StateSwitchInterface,
   StateSwitchOptions,
 }                             from '../interface.js'
 // import { nopLogger }            from '../nop-logger.js'
@@ -27,7 +28,9 @@ import {
 import { buildMachineOptions }  from './machine-options.js'
 import { waitForMachineState }  from './wait-for-selector.js'
 import { guardMachineEvent }    from './guard-machine-event.js'
-import { nopLogger } from '../nop-logger.js'
+import { getLoggable } from 'brolog'
+import type { Loggable } from 'brolog'
+import { StateSwitch } from '../state-switch.js'
 
 const serviceCtlFsmMixin = (
   serviceCtlName = 'ServiceCtlFsm',
@@ -38,7 +41,12 @@ const serviceCtlFsmMixin = (
 
     static VERSION = VERSION
 
-    _serviceCtlLog: any // BrologInterface
+    /**
+     * Huan(202110): this state is simple record the start/stop status
+     */
+    state: StateSwitchInterface
+
+    _serviceCtlLog: Loggable
     _serviceCtlFsmInterpreter: Interpreter<
       ServiceCtlContext,
       ServiceCtlState,
@@ -48,8 +56,10 @@ const serviceCtlFsmMixin = (
     constructor (...args: any[]) {
       super(...args)
 
-      this._serviceCtlLog = options?.log || nopLogger()
+      this._serviceCtlLog = getLoggable(options?.log)
       this._serviceCtlLog.verbose(serviceCtlName, 'constructor()')
+
+      this.state = new StateSwitch(serviceCtlName, options)
 
       const machineOptions = buildMachineOptions({
         // reset: () => has been internally implemented by calling stop() and start()
@@ -70,6 +80,7 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this._serviceCtlFsmInterpreter, 'canceled')
 
       this._serviceCtlFsmInterpreter.send('START')
+      this.state.active(true)
 
       return Promise.race([
         started,
@@ -85,6 +96,7 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this._serviceCtlFsmInterpreter, 'canceled')
 
       this._serviceCtlFsmInterpreter.send('STOP')
+      this.state.inactive(true)
 
       return Promise.race([
         stopped,

@@ -26,11 +26,11 @@ test('StateSwitch satisfy DOM EventTarget: HasEventTargetAddRemove', async t => 
 
 test('RxJS: fromEvent type inference', async (t) => {
   const state = new StateSwitch()
-  const event$ = fromEvent(state, 'on')
+  const event$ = fromEvent(state, 'active')
   expectType<Observable<true | 'pending'>>(event$)
 
   const future = firstValueFrom(event$)
-  state.on('pending')
+  state.active('pending')
 
   const result = await future
   expectType<true | 'pending'>(result)
@@ -38,11 +38,11 @@ test('RxJS: fromEvent type inference', async (t) => {
 
 test('RxJS: fromEvent stream for the second value', async (t) => {
   const state = new StateSwitch()
-  const event$ = fromEvent(state, 'off')
-  state.off('pending')
+  const event$ = fromEvent(state, 'inactive')
+  state.inactive('pending')
 
   const future = firstValueFrom(event$)
-  state.off(true)
+  state.inactive(true)
 
   const result = await future
   t.equal(result, true, 'should get "true" result')

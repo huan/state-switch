@@ -1,6 +1,6 @@
 {
   "name": "state-switch",
-  "version": "1.0.16",
+  "version": "1.1.0",
   "description": "State Switch is a Change Monitor/Guarder for Async Actions.",
   "type": "module",
   "exports": {
@@ -23,9 +23,9 @@
     "lint:ts": "tsc --isolatedModules --noEmit",
     "lint:es": "eslint --ignore-pattern fixtures/ \"src/**/*.ts\" \"tests/**/*.ts\"",
     "demo": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" node example/demo",
-    "test": "npm-run-all lint test:ts",
+    "test": "npm-run-all lint test:unit",
     "test:pack": "bash -x scripts/npm-pack-testing.sh",
-    "test:ts": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
+    "test:unit": "cross-env NODE_OPTIONS=\"--no-warnings --loader=ts-node/esm\" tap \"src/**/*.spec.ts\" \"tests/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",
@@ -51,13 +51,10 @@
     "tsd": "^0.18.0"
   },
   "peerDependencies": {
+    "brolog": "^1.13.3",
     "rxjs": "^7.4.0"
   },
   "files": [
-    "LICENSE",
-    "README.md",
-    "package.json",
-    "bundles",
     "dist/",
     "src/"
   ],

@@ -300,7 +300,7 @@ Use a Finite State Machine (FSM) to manage the state of your service.
 
 ```ts
 class MyService extends ServiceCtlMixin(Service) {
-  
+
   async onStart (): Promise<void> {
     // your start code
   }
@@ -332,7 +332,36 @@ Learn more about the finite state machine design pattern inside our `ServiceCtl`
 
 ## CHANGELOG
 
-### master v1.0 (Oct 23, 2021)
+### master v1.1 (Oct 27, 2021)
+
+Breaking changes:
+
+1. `StateSwitch#pending` -> `StateSwitch#pending()`
+1. `StateSwitch#on()` -> `StateSwitch#active()`
+1. `StateSwitch#off()` -> `StateSwitch#inactive()`
+1. `emit('on')` -> `emit('active')`
+1. `emit('off')` -> `emit('inactive')`
+
+TL;DR:
+
+```diff
+- state.on()
++ state.active()
+
+- state.on(true)
++ state.active(true)
+
+- state.off()
++ state.inactive()
+
+- state.off(true)
++ staet.inactive(true)
+
+- state.pending
++ state.pending()
+```
+
+### v1.0 (Oct 23, 2021)
 
 - Oct 27: Add `ServiceCtl`/`ServiceCtlFsm` abstract class and `serviceCtlMixin`/`serviceCtlFsmMixin` mixin
 - Oct 23: Add `BusyIndicator` class

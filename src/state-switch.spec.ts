@@ -7,150 +7,145 @@ import {
 
 import { StateSwitch } from './state-switch.js'
 
-test('on()', async t => {
+test('active()', async t => {
   const ss = new StateSwitch()
 
-  t.notOk(ss.on(), 'default is not on')
+  t.ok(ss.inactive(), 'default is not active')
 
-  ss.on('pending')
-  t.equal(ss.on(), 'pending', 'should be state pending')
+  ss.active('pending')
+  t.equal(ss.active(), 'pending', 'should be state pending')
 
-  ss.on(true)
-  t.equal(ss.on(), true, 'should be state true')
-  t.notOk(ss.off(), 'should not off')
+  ss.active(true)
+  t.equal(ss.active(), true, 'should be active `true`')
+  t.notOk(ss.inactive(), 'should not inactive')
 
-  ss.off(true)
-  t.notOk(ss.on(), 'should not ON after off()')
+  ss.inactive(true)
+  t.notOk(ss.active(), 'should not active after call inactive(true)')
 })
 
-test('off()', async t => {
+test('inactive()', async t => {
   const ss = new StateSwitch()
 
-  t.ok(ss.off(), 'default is off')
-  t.equal(ss.off(), true, 'should in state true')
+  t.ok(ss.inactive(), 'default is inactive')
+  t.equal(ss.inactive(), true, 'should in state true')
 
-  ss.off('pending')
-  t.equal(ss.off(), 'pending', 'should be state pending')
+  ss.inactive('pending')
+  t.equal(ss.inactive(), 'pending', 'should be state pending')
 
-  ss.off(true)
-  t.equal(ss.off(), true, 'should be state true')
-  t.notOk(ss.on(), 'should not on')
+  ss.inactive(true)
+  t.equal(ss.inactive(), true, 'should be state true')
+  t.notOk(ss.active(), 'should not active')
 
-  ss.on(true)
-  t.notOk(ss.off(), 'should not OFF after on()')
+  ss.active(true)
+  t.notOk(ss.inactive(), 'should not inactive after called active()')
 })
 
 test('pending', async t => {
   const ss = new StateSwitch()
 
-  t.notOk(ss.pending, 'default is not pending')
+  t.notOk(ss.pending(), 'default is not pending')
 
-  ss.on('pending')
-  t.ok(ss.pending, 'should in pending state')
+  ss.active('pending')
+  t.ok(ss.pending(), 'should in pending state')
 
-  ss.on(true)
-  t.notOk(ss.pending, 'should not in pending state')
+  ss.active(true)
+  t.notOk(ss.pending(), 'should not in pending state')
 
-  ss.off('pending')
-  t.ok(ss.pending, 'should in pending state')
+  ss.inactive('pending')
+  t.ok(ss.pending(), 'should in pending state')
 })
 
 test('name', async t => {
   const CLIENT_NAME = 'StateSwitchTest'
   const ss = new StateSwitch(CLIENT_NAME)
 
-  t.equal(ss.name, CLIENT_NAME, 'should get the same client name as init')
+  t.equal(ss.name(), CLIENT_NAME, 'should get the same client name as init')
 })
 
-test('version()', t => {
+test('version()', async t => {
   const ss = new StateSwitch()
   t.ok(ss.version(), 'should get version')
-  t.end()
 })
 
-test('ready()', async t => {
+test('stable()', async t => {
   const spy = sinon.spy()
 
   const ss = new StateSwitch()
 
-  ss.ready('off').then(() => spy('off')).catch(() => t.fail('rejection'))
+  ss.stable('inactive').then(() => spy('inactive')).catch(() => t.fail('rejection'))
   await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should be read off at the initial state')
+  t.equal(spy.callCount, 1, 'should be stable for inactive at the initial state')
 
   spy.resetHistory()
-  ss.ready('on', true).catch(() => spy('on'))
-  await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should catch the exception when noCross=true')
+  await t.rejects(() => ss.stable('active', true), 'should catch the exception when noCross=true')
 
   spy.resetHistory()
-  ss.ready('on').then(() => spy('on')).catch(() => t.fail('rejection'))
-  ss.on(true)
-  await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should ready(on)')
+  const future = t.resolves(() => ss.stable('active'), 'should stable(active)')
+  ss.active(true)
+  await future
 
   spy.resetHistory()
-  ss.ready('on').then(() => spy('on')).catch(() => t.fail('rejection'))
-  await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should ready(on) when already on')
+  await t.resolves(() => ss.stable('active'), 'should stable(active) when already on')
 
   spy.resetHistory()
-  ss.ready('off').then(() => spy('off')).catch(() => t.fail('rejection'))
+  ss.stable('inactive').then(() => spy('inactive')).catch(() => t.fail('rejection'))
   await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 0, 'should not ready(off) when its on')
+  t.equal(spy.callCount, 0, 'should not stable(inactive) when its on')
 
-  ss.off(true)
+  ss.inactive(true)
   await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should ready(off) after call off(true)')
+  t.equal(spy.callCount, 1, 'should stable(inactive) after call inactive(true)')
 })
 
-test('ready() without default arg for waiting current state', async t => {
+test('stable() without default arg for waiting current state', async t => {
   const spy = sinon.spy()
   const ss = new StateSwitch()
 
-  ss.off('pending')
-  ss.ready().then(() => spy('off')).catch(() => t.fail('rejection'))
-  ss.off(true)
+  ss.inactive('pending')
+  ss.stable().then(() => spy('inactive')).catch(() => t.fail('rejection'))
+  ss.inactive(true)
   await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should be ready() for off(true)')
+  t.equal(spy.callCount, 1, 'should be stable() for inactive(true)')
 
   spy.resetHistory()
 
-  ss.on('pending')
-  ss.ready().then(() => spy('on')).catch(() => t.fail('rejection'))
-  ss.on(true)
+  ss.active('pending')
+  ss.stable().then(() => spy('active')).catch(() => t.fail('rejection'))
+  ss.active(true)
   await new Promise(resolve => setImmediate(resolve))
-  t.equal(spy.callCount, 1, 'should be ready() for on(true)')
+  t.equal(spy.callCount, 1, 'should be stable() for active(true)')
 })
 
-test('on/off events emitting', async t => {
-  const spyOn  = sinon.spy()
-  const spyOff = sinon.spy()
+test('active/inactive events emitting', async t => {
+  const spyActive  = sinon.spy()
+  const spyInactive = sinon.spy()
 
   const ss = new StateSwitch()
 
-  ss.addListener('on',  spyOn)
-  ss.addListener('off', spyOff)
+  ss.addListener('active',  spyActive)
+  ss.addListener('inactive', spyInactive)
 
-  t.ok(spyOn.notCalled, 'spyOn is not called')
-  t.ok(spyOff.notCalled, 'spyOff is not called')
+  t.ok(spyActive.notCalled, 'spyActive is not called')
+  t.ok(spyInactive.notCalled, 'spyInactive is not called')
 
-  ss.on('pending')
-  t.ok(spyOn.calledOnce, 'spyOn is called once after on(pending)')
-  t.same(spyOn.args[0], ['pending'], 'spyOn should be called with `pending` arg')
-  t.ok(spyOff.notCalled, 'spyOff is not called')
+  ss.active('pending')
+  t.ok(spyActive.calledOnce, 'spyActive is called once after on(pending)')
+  t.same(spyActive.args[0], ['pending'], 'spyActive should be called with `pending` arg')
+  t.ok(spyInactive.notCalled, 'spyInactive is not called')
 
-  ss.on(true)
-  t.ok(spyOn.calledTwice, 'spyOn is called once after on(pending)')
-  t.same(spyOn.args[1], [true], 'spyOn should be called with `true` arg')
-  t.ok(spyOff.notCalled, 'spyOff is not called')
+  ss.active(true)
+  t.ok(spyActive.calledTwice, 'spyActive is called once after active(pending)')
+  t.same(spyActive.args[1], [true], 'spyActive should be called with `true` arg')
+  t.ok(spyInactive.notCalled, 'spyInactive is not called')
 
-  ss.off('pending')
-  t.ok(spyOff.calledOnce, 'spyOff is called once after off(pending)')
-  t.same(spyOff.args[0], ['pending'], 'spyOff should be called with `pending` arg')
+  ss.inactive('pending')
+  await Promise.resolve()
+  t.ok(spyInactive.calledOnce, 'spyInactive is called once after inactive(pending)')
+  t.same(spyInactive.args[0], ['pending'], 'spyInactive should be called with `pending` arg')
 
-  ss.off(true)
-  t.ok(spyOff.calledTwice, 'spyOff is called twice after off(true)')
-  t.same(spyOff.args[1], [true], 'spyOff should be called with `true` arg')
+  ss.inactive(true)
+  t.ok(spyInactive.calledTwice, 'spyInactive is called twice after inactive(true)')
+  t.same(spyInactive.args[1], [true], 'spyInactive should be called with `true` arg')
 
-  t.ok(spyOn.calledTwice, 'spyOn called twice at last')
+  t.ok(spyActive.calledTwice, 'spyActive called twice at last')
 })

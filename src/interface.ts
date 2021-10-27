@@ -1,12 +1,14 @@
+import type { Loggable } from 'brolog'
+
 import type { StateSwitch } from './state-switch.js'
 import type { BusyIndicator } from './busy-indicator.js'
 import { ServiceCtl } from './service-ctl/service-ctl.js'
 
 interface StateSwitchInterface {
-  off     : StateSwitch['off']
-  on      : StateSwitch['on']
-  pending : StateSwitch['pending']
-  ready   : StateSwitch['ready']
+  active   : StateSwitch['active']
+  inactive : StateSwitch['inactive']
+  pending  : StateSwitch['pending']
+  stable   : StateSwitch['stable']
 }
 
 interface BusyIndicatorInterface {
@@ -15,15 +17,18 @@ interface BusyIndicatorInterface {
 }
 
 interface ServiceCtlInterface {
+  state: StateSwitchInterface
+
   onStart : ServiceCtl['onStart']
   onStop  : ServiceCtl['onStop']
+
   reset   : ServiceCtl['reset']
   start   : ServiceCtl['start']
   stop    : ServiceCtl['stop']
 }
 
 interface StateSwitchOptions {
-  log?: any
+  log?: Loggable
 }
 
 export type {

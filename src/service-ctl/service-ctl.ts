@@ -4,6 +4,8 @@
  */
 import { EventEmitter } from 'events'
 import { Constructor }  from 'clone-class'
+import { getLoggable }  from 'brolog'
+import type { Loggable } from 'brolog'
 
 import {
   ServiceCtlInterface,
@@ -12,7 +14,6 @@ import {
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
 import { VERSION }              from '../version.js'
-import { nopLogger }            from '../nop-logger.js'
 
 import { timeoutPromise } from './timeout-promise.js'
 
@@ -30,34 +31,35 @@ const serviceCtlMixin = (
 
     static VERSION = VERSION
 
-    _serviceCtlStateSwitch         : StateSwitch
+    state: StateSwitch
+
     _serviceCtlBusyIndicator : BusyIndicator
-    _serviceCtlLog           : any            // BrologInterface
+    _serviceCtlLog           : Loggable
 
     constructor (...args: any[]) {
       super(...args)
 
-      this._serviceCtlStateSwitch         = new StateSwitch(serviceCtlName,   options?.log)
-      this._serviceCtlBusyIndicator = new BusyIndicator(serviceCtlName, options?.log)
+      this.state   = new StateSwitch(serviceCtlName, options)
+      this._serviceCtlBusyIndicator = new BusyIndicator(serviceCtlName, options)
 
-      this._serviceCtlLog = options?.log || nopLogger()
+      this._serviceCtlLog = getLoggable(options?.log)
     }
 
     async start () : Promise<void> {
-      if (this._serviceCtlStateSwitch.on()) {
+      if (this.state.active()) {
         this._serviceCtlLog.warn(serviceCtlName, 'start() found that is starting/statred...')
-        await this._serviceCtlStateSwitch.ready('on')
+        await this.state.stable('active')
         this._serviceCtlLog.warn(serviceCtlName, 'start() found that is starting/statred... done')
         return
       }
 
-      if (this._serviceCtlStateSwitch.off() === 'pending') {
+      if (this.state.inactive() === 'pending') {
         this._serviceCtlLog.warn(serviceCtlName, 'start() found that is stopping...')
 
         try {
           this._serviceCtlLog.warn('Wechaty', 'start() found that is stopping, waiting stable ... (max %s seconds)', TIMEOUT_SECONDS)
           await timeoutPromise(
-            this._serviceCtlStateSwitch.ready('off'),
+            this.state.stable('inactive'),
             TIMEOUT_SECONDS * 1000,
           )
           this._serviceCtlLog.warn('Wechaty', 'start() found that is stopping, waiting stable ... done')
@@ -67,7 +69,7 @@ const serviceCtlMixin = (
         }
       }
 
-      this._serviceCtlStateSwitch.on('pending')
+      this.state.active('pending')
 
       try {
         this._serviceCtlLog.verbose(serviceCtlName, 'start() this.onStart() ...')
@@ -77,7 +79,7 @@ const serviceCtlMixin = (
         /**
          * the service has been successfully started
          */
-        this._serviceCtlStateSwitch.on(true)
+        this.state.active(true)
 
       } catch (e) {
         this.emit('error', e)
@@ -89,20 +91,20 @@ const serviceCtlMixin = (
     async stop (): Promise<void> {
       this._serviceCtlLog.verbose(serviceCtlName, 'stop()')
 
-      if (this._serviceCtlStateSwitch.off()) {
+      if (this.state.inactive()) {
         this._serviceCtlLog.warn(serviceCtlName, 'stop() found that is stopping/stopped...')
-        await this._serviceCtlStateSwitch.ready()
+        await this.state.stable('inactive')
         this._serviceCtlLog.warn(serviceCtlName, 'stop() found that is stopping/stopped... done')
         return
       }
 
-      if (this._serviceCtlStateSwitch.on() === 'pending') {
+      if (this.state.active() === 'pending') {
         this._serviceCtlLog.warn(serviceCtlName, 'stop() found that is starting...')
 
         try {
           this._serviceCtlLog.warn('Wechaty', 'stop() found that is starting, waiting stable ... (max %s seconds)', TIMEOUT_SECONDS)
           await timeoutPromise(
-            this._serviceCtlStateSwitch.ready('on'),
+            this.state.stable('active'),
             TIMEOUT_SECONDS * 1000,
           )
           this._serviceCtlLog.warn('Wechaty', 'stop() found that is starting, waiting stable ... done')
@@ -112,12 +114,12 @@ const serviceCtlMixin = (
         }
       }
 
-      this._serviceCtlStateSwitch.off('pending')
+      this.state.inactive('pending')
 
       try {
-        this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.stop() ...')
+        this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.onStop() ...')
         await this.onStop()
-        this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.stop() done')
+        this._serviceCtlLog.verbose(serviceCtlName, 'stop() this.onStop() done')
       } catch (e) {
         this.emit('error', e)
       }
@@ -126,7 +128,7 @@ const serviceCtlMixin = (
        * no matter whether the `try {...}` code success or not
        *  set the service state to off(stopped) state
        */
-      this._serviceCtlStateSwitch.off(true)
+      this.state.inactive(true)
     }
 
     async reset (): Promise<void> {
@@ -135,7 +137,7 @@ const serviceCtlMixin = (
       /**
        * Do not start Service if it's OFF
        */
-      if (this._serviceCtlStateSwitch.off()) {
+      if (this.state.inactive()) {
         this._serviceCtlLog.verbose(serviceCtlName, 'reset() `state` is `off`, do nothing')
         return
       }
@@ -166,12 +168,12 @@ const serviceCtlMixin = (
       try {
         /**
          * If the Service is starting/stopping, wait for it
-         * The state will be `'on'` after await `ready()`
+         * The state will be `'active'` after await `stable()`
          */
         try {
           this._serviceCtlLog.verbose(serviceCtlName, 'reset() wait state ready() ...')
           await timeoutPromise(
-            this._serviceCtlStateSwitch.ready(),
+            this.state.stable(),
             3 * TIMEOUT_SECONDS * 1000,
             () => new Error('state.ready() timeout'),
           )
