@@ -58,7 +58,7 @@ const serviceCtlFsmMixin = (
       super(...args)
 
       this._serviceCtlLog = getLoggable(options?.log)
-      this._serviceCtlLog.verbose(serviceCtlName, 'constructor()')
+      this._serviceCtlLog.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'constructor()')
 
       this.state = new StateSwitch(serviceCtlName, options)
 
@@ -80,7 +80,7 @@ const serviceCtlFsmMixin = (
     }
 
     override start (): Promise<void> {
-      this._serviceCtlLog.verbose(serviceCtlName, 'start()')
+      this._serviceCtlLog.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start()')
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'START')
 
       const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
@@ -96,7 +96,7 @@ const serviceCtlFsmMixin = (
     }
 
     override stop (): Promise<void> {
-      this._serviceCtlLog.verbose(serviceCtlName, 'stop()')
+      this._serviceCtlLog.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop()')
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'STOP')
 
       const stopped   = waitForMachineState(this._serviceCtlFsmInterpreter, 'inactive')
@@ -112,7 +112,7 @@ const serviceCtlFsmMixin = (
     }
 
     reset (): Promise<void> {
-      this._serviceCtlLog.verbose(serviceCtlName, 'reset()')
+      this._serviceCtlLog.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset()')
       guardMachineEvent(this._serviceCtlFsmInterpreter, 'RESET')
 
       const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
