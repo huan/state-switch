@@ -117,7 +117,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
      * Set
      */
     if (state) {
-      this._log.verbose('StateSwitch', '<%s> on(%s) <- (%s)',
+      this._log.verbose('StateSwitch', '<%s> active(%s) <- (%s)',
         this._name,
         state,
         this.active(),
@@ -152,7 +152,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
     const activeState = this._isActive
       ? this._isPending ? 'pending' : true
       : false
-    this._log.silly('StateSwitch', '<%s> on() is %s', this._name, activeState)
+    this._log.silly('StateSwitch', '<%s> active() is %s', this._name, activeState)
     return activeState
   }
 
@@ -177,7 +177,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
      * Set
      */
     if (state) {
-      this._log.verbose('StateSwitch', '<%s> off(%s) <- (%s)',
+      this._log.verbose('StateSwitch', '<%s> inactive(%s) <- (%s)',
         this._name,
         state,
         this.inactive(),
@@ -211,7 +211,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
     const inactiveState = !this._isActive
       ? this._isPending ? 'pending' : true
       : false
-    this._log.silly('StateSwitch', '<%s> off() is %s', this._name, inactiveState)
+    this._log.silly('StateSwitch', '<%s> inactive() is %s', this._name, inactiveState)
     return inactiveState
   }
 
