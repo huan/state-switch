@@ -9,7 +9,6 @@ import {
   ServiceCtlInterface,
   StateSwitchOptions,
   ServiceableAbstract,
-  EmptyServiceableImpl,
 }                               from '../interfaces.js'
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
@@ -79,9 +78,11 @@ const serviceCtlMixin = (
         /**
          * Parent start()
          */
-        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'start() super.start() ...')
-        await super.start()
-        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'start() super.start() ... done')
+        if (typeof super.start === 'function') {
+          this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'start() super.start() ...')
+          await super.start()
+          this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'start() super.start() ... done')
+        }
 
         /**
          * Child onStart()
@@ -151,12 +152,14 @@ const serviceCtlMixin = (
       /**
        * Parent stop()
        */
-      try {
-        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'stop() super.stop() ...')
-        await super.stop()
-        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'stop() super.stop() ... done')
-      } catch (e) {
-        this.emit('error', e)
+      if (typeof super.stop === 'function') {
+        try {
+          this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'stop() super.stop() ...')
+          await super.stop()
+          this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'stop() super.stop() ... done')
+        } catch (e) {
+          this.emit('error', e)
+        }
       }
 
       /**
@@ -242,7 +245,7 @@ const serviceCtlMixin = (
   return ServiceCtlMixin
 }
 
-abstract class ServiceCtl extends serviceCtlMixin()(EmptyServiceableImpl) {}
+abstract class ServiceCtl extends serviceCtlMixin()(ServiceableAbstract) {}
 
 export {
   ServiceCtl,

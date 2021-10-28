@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 import type { Loggable } from 'brolog'
 
 import type { StateSwitch } from './state-switch.js'
@@ -33,16 +32,13 @@ abstract class ServiceableAbstract {
 
   constructor (..._: any[]) {}
 
-  start (..._: any[]): any {}
-  stop (..._: any[]): any {}
-  emit (..._: any[]): any {}
-
-}
-
-class EmptyServiceableImpl extends EventEmitter implements ServiceableAbstract {
-
-  start () {}
-  stop () {}
+  /**
+   * start/stop is optional:
+   *  if they exists, then they will be called
+   */
+  start?  (..._: any[]): any {}
+  stop?   (..._: any[]): any {}
+  emit    (..._: any[]): any {}
 
 }
 
@@ -54,5 +50,4 @@ export type {
 }
 export {
   ServiceableAbstract,
-  EmptyServiceableImpl,
 }

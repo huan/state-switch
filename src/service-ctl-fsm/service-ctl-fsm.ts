@@ -10,7 +10,6 @@ import {
 
 import { VERSION }              from '../version.js'
 import {
-  EmptyServiceableImpl,
   ServiceableAbstract,
   ServiceCtlInterface,
   StateSwitchInterface,
@@ -64,13 +63,17 @@ const serviceCtlFsmMixin = (
 
       const machineOptions = buildMachineOptions({
         // reset: () => has been internally implemented by calling stop() and start()
-        start : async () => {
-          await super.start()
+        start: async () => {
+          if (typeof super.start === 'function') {
+            await super.start()
+          }
           await this.onStart()
         },
-        stop  : async () => {
+        stop: async () => {
           await this.onStop()
-          await super.stop()
+          if (typeof super.stop === 'function') {
+            await super.stop()
+          }
         },
       })
       const machine = createMachine(config, machineOptions)
@@ -121,6 +124,7 @@ const serviceCtlFsmMixin = (
       this._serviceCtlFsmInterpreter.send('RESET')
 
       // TODO: emit('error' e) if there's any rejections inside `reset()`
+      //  or the error should be handled by the onStart/onStop ?
 
       return Promise.race([
         started,
@@ -137,7 +141,7 @@ const serviceCtlFsmMixin = (
   return ServiceCtlFsmMixin
 }
 
-abstract class ServiceCtlFsm extends serviceCtlFsmMixin()(EmptyServiceableImpl) {}
+abstract class ServiceCtlFsm extends serviceCtlFsmMixin()(ServiceableAbstract) {}
 
 export {
   ServiceCtlFsm,
