@@ -78,14 +78,16 @@ const serviceCtlMixin = (
         /**
          * Parent start()
          */
+        this._serviceCtlLogger.verbose(serviceCtlName, 'start() super.start() ...')
         await super.start()
+        this._serviceCtlLogger.verbose(serviceCtlName, 'start() super.start() ... done')
 
         /**
          * Child onStart()
          */
         this._serviceCtlLogger.verbose(serviceCtlName, 'start() this.onStart() ...')
         await this.onStart()
-        this._serviceCtlLogger.verbose(serviceCtlName, 'start() this.onStart() done')
+        this._serviceCtlLogger.verbose(serviceCtlName, 'start() this.onStart() ... done')
 
         /**
          * the service has been successfully started
@@ -149,7 +151,9 @@ const serviceCtlMixin = (
        * Parent stop()
        */
       try {
+        this._serviceCtlLogger.verbose(serviceCtlName, 'stop() super.stop() ...')
         await super.stop()
+        this._serviceCtlLogger.verbose(serviceCtlName, 'stop() super.stop() ... done')
       } catch (e) {
         this.emit('error', e)
       }
