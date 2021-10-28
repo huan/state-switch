@@ -41,7 +41,7 @@ const serviceCtlMixin = (
       super(...args)
 
       this.state = new StateSwitch(serviceCtlName, options)
-      this._serviceCtlResettingIndicator = new BusyIndicator(serviceCtlName, options)
+      this._serviceCtlResettingIndicator = new BusyIndicator(serviceCtlName + 'Reset', options)
 
       this._serviceCtlLog = getLoggable(options?.log)
     }
