@@ -135,9 +135,10 @@ const serviceCtlFsmMixin = (
       return Promise.race([
         started,
         canceled,
-      ])
-
-      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
+      ]).then(() => {
+        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
+        return undefined
+      })
     }
 
     /**
