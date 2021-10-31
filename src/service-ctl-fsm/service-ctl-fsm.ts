@@ -95,7 +95,10 @@ const serviceCtlFsmMixin = (
       return Promise.race([
         started,
         canceled,
-      ])
+      ]).then(() => {
+        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start() ... done')
+        return undefined
+      })
     }
 
     override stop (): Promise<void> {
@@ -111,7 +114,10 @@ const serviceCtlFsmMixin = (
       return Promise.race([
         stopped,
         canceled,
-      ])
+      ]).then(() => {
+        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop() ... done')
+        return undefined
+      })
     }
 
     reset (): Promise<void> {
@@ -131,8 +137,12 @@ const serviceCtlFsmMixin = (
         canceled,
       ])
 
+      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
     }
 
+    /**
+     * onStart & onStop must be implemented by the child class
+     */
     abstract onStart (): Promise<void>
     abstract onStop  (): Promise<void>
 

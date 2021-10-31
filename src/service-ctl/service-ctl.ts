@@ -101,6 +101,8 @@ const serviceCtlMixin = (
         await this.stop()
         throw e
       }
+
+      this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'start() ... done')
     }
 
     override async stop (): Promise<void> {
@@ -167,6 +169,8 @@ const serviceCtlMixin = (
        *  set the service state to off(stopped) state
        */
       this.state.inactive(true)
+
+      this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'stop() ... done')
     }
 
     async reset (): Promise<void> {
@@ -235,8 +239,12 @@ const serviceCtlMixin = (
         this._serviceCtlResettingIndicator.busy(false)
       }
 
+      this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'reset() ... done')
     }
 
+    /**
+     * onStart & onStop must be implemented by the child class
+     */
     abstract onStart (): Promise<void>
     abstract onStop  (): Promise<void>
 
