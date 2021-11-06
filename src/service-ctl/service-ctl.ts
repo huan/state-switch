@@ -2,8 +2,9 @@
  * Licenst: Apache-2.0
  * https://github.com/huan/state-switch
  */
-import { getLoggable }  from 'brolog'
-import type { Loggable } from 'brolog'
+import { getLoggable }    from 'brolog'
+import type { Loggable }  from 'brolog'
+import { timeoutPromise } from 'gerror'
 
 import {
   ServiceCtlInterface,
@@ -13,8 +14,6 @@ import {
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
 import { VERSION }              from '../version.js'
-
-import { timeoutPromise } from './timeout-promise.js'
 
 /**
  * Wait from unknown state

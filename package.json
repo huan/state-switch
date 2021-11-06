@@ -53,6 +53,7 @@
   },
   "peerDependencies": {
     "brolog": "^1.13.6",
+    "gerror": "^1.0.6",
     "rxjs": "^7.4.0"
   },
   "files": [
