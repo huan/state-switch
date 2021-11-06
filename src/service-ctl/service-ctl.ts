@@ -111,9 +111,9 @@ const serviceCtlMixin = (
        * Already in inactive/stop state: return directly
        */
       if (this.state.inactive()) {
-        this._serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is stopping/stopped...')
+        this._serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is stopping/stopped, wait stable ...')
         await this.state.stable('inactive')
-        this._serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is stopping/stopped... done')
+        this._serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is stopping/stopped, wait stable ... done')
         return
       }
 
