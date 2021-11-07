@@ -282,22 +282,4 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
     return this.stable()
   }
 
-  /**
-   * Huan(202105): To make RxJS fromEvent happy: type inferencing
-   *  https://github.com/ReactiveX/rxjs/blob/92fbdda7c06561bc73dae3c14de3fc7aff92bbd4/src/internal/observable/fromEvent.ts#L39-L50
-   */
-  addEventListener (
-    event: StateType,
-    listener: ((payload: true | 'pending') => void),
-  ): void {
-    super.addListener(event, listener)
-  }
-
-  removeEventListener (
-    event: string,
-    listener: ((payload: true | 'pending') => void),
-  ): void {
-    super.removeListener(event, listener)
-  }
-
 }
