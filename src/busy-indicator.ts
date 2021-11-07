@@ -37,14 +37,6 @@ class BusyIndicator {
     await this.state.stable('inactive')
   }
 
-  /**
-   * @deprecated use idle() instead
-   */
-  async available (): Promise<void> {
-    console.error('available() is deprecated, use idle() instead.\n' + new Error().stack)
-    return this.idle()
-  }
-
 }
 
 export { BusyIndicator }

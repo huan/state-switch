@@ -8,7 +8,6 @@
  *
  * Helper Class for Manage State Change
  */
-import { EventEmitter } from 'events'
 import type { Loggable } from 'brolog'
 import { getLoggable }  from 'brolog'
 import {
@@ -18,30 +17,20 @@ import {
 
 import {
   VERSION,
-}                       from './version.js'
+}                           from './version.js'
 import type {
   StateSwitchInterface,
   StateSwitchOptions,
-}                       from './interfaces.js'
-
-/**
- * Using Three Valued Logic for ON/OFF State
- *  https://github.com/huan/state-switch/issues/1
- *
- * Three-valued Logic (3VL): `true`, `false`, and
- *  'pending': it's in process, not stable.
- */
-type Pending = 'pending'
-type StateType =
-  | 'active'
-  | 'inactive'
-  // `on` & `off` are deprecated. use `active` and `inactive` instead
-  | 'on'
-  | 'off'
+}                           from './interfaces.js'
+import {
+  StateSwitchEventEmitter,
+  Pending,
+  StateType,
+}                           from './events.js'
 
 let COUNTER = 0
 
-export class StateSwitch extends EventEmitter implements StateSwitchInterface {
+export class StateSwitch extends StateSwitchEventEmitter implements StateSwitchInterface {
 
   protected _log: Loggable
 
@@ -91,13 +80,6 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   }
 
   /**
-   * @deprecated will be removed after Dec 31, 2022
-   */
-  setLog (logInstance?: any) {
-    this._log = getLoggable(logInstance)
-  }
-
-  /**
    * Get the current ON state (3VL).
    */
   active (): boolean | Pending
@@ -127,10 +109,6 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       this._isPending = (state === 'pending')
 
       this.emit('active', state)
-      /**
-       * @deprecated `on` event will be removed after Dec 31, 2022
-       */
-      this.emit('on', state)
 
       /**
         * for stable()
@@ -186,10 +164,6 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       this._isPending = (state === 'pending')
 
       this.emit('inactive', state)
-      /**
-       * @deprecated `off` event will be removed after Dec 31, 2022
-       */
-      this.emit('off', state)
 
       /**
         * for stable()
@@ -216,22 +190,6 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
   }
 
   /**
-   * @deprecate use `active()` instead. will be removed after Dec 31, 2022
-   */
-  override on (state: any): any {
-    this._log.error('StateSwitch', 'on() is deprecated: use active() instead.\n%s', new Error().stack)
-    return this.active(state)
-  }
-
-  /**
-   * @deprecate use `inactive()` instead. will be removed after Dec 31, 2022
-   */
-  override off (state: any): any {
-    this._log.error('StateSwitch', 'off() is deprecated: use inactive() instead.\n%s', new Error().stack)
-    return this.inactive(state)
-  }
-
-  /**
    * does the state is not stable(in process)?
    */
   pending () {
@@ -252,7 +210,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       state = this._isActive ? 'active' : 'inactive'
     }
 
-    if (state === 'active' || state === 'on') {
+    if (state === 'active') {
       if (this._isActive === false && noCross === true) {
         throw new Error('stable(active) but the state is inactive. call stable(active, false) to disable noCross')
       }
@@ -260,7 +218,7 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
       await this._activePromise
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (state === 'inactive' || state === 'off') {
+    } else if (state === 'inactive') {
       if (this._isActive === true && noCross === true) {
         throw new Error('stable(inactive) but the state is active. call stable(inactive, false) to disable noCross')
       }
@@ -272,14 +230,6 @@ export class StateSwitch extends EventEmitter implements StateSwitchInterface {
 
     this._log.silly('StateSwitch', '<%s> stable(%s, %s) resolved.', this._name, state, noCross)
 
-  }
-
-  /**
-   * @deprecated use `stable()` instead. will be removed after Dec 31, 2022
-   */
-  ready () {
-    this._log.error('StateSwitch', 'ready() is deprecated: use stable() instead.\n%s', new Error().stack)
-    return this.stable()
   }
 
 }

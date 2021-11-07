@@ -1,8 +1,8 @@
 import type { Loggable } from 'brolog'
 
-import type { StateSwitch } from './state-switch.js'
+import type { StateSwitch }   from './state-switch.js'
 import type { BusyIndicator } from './busy-indicator.js'
-import type { ServiceCtl } from './service-ctl/service-ctl.js'
+import type { ServiceCtl }    from './service-ctl/service-ctl.js'
 
 interface StateSwitchInterface {
   active   : StateSwitch['active']
