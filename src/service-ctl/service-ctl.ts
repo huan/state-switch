@@ -176,14 +176,6 @@ const serviceCtlMixin = (
       this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'reset()')
 
       /**
-       * Do not start Service if it's OFF
-       */
-      if (this.state.inactive()) {
-        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'reset() `state` is `off`, do nothing')
-        return
-      }
-
-      /**
        * Do not reset again if it's already resetting
        */
       if (this._serviceCtlResettingIndicator.busy()) {
@@ -204,6 +196,14 @@ const serviceCtlMixin = (
         }
       }
 
+      /**
+       * Do not start Service if the stable state is OFF
+       */
+      if (this.state.inactive()) {
+        this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'reset() `state` is `off`, do nothing')
+        return
+      }
+      
       this._serviceCtlResettingIndicator.busy(true)
 
       /**
