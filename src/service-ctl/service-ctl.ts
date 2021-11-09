@@ -10,6 +10,7 @@ import {
   ServiceCtlInterface,
   StateSwitchOptions,
   ServiceableAbstract,
+  StateSwitchInterface,
 }                               from '../interfaces.js'
 import { StateSwitch }          from '../state-switch.js'
 import { BusyIndicator }        from '../busy-indicator.js'
@@ -30,7 +31,7 @@ const serviceCtlMixin = (
 
     static VERSION = VERSION
 
-    state: StateSwitch
+    state: StateSwitchInterface
 
     _serviceCtlResettingIndicator : BusyIndicator
     _serviceCtlLogger                : Loggable
