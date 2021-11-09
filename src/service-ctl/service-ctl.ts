@@ -204,7 +204,7 @@ const serviceCtlMixin = (
         this._serviceCtlLogger.verbose(`ServiceCtl<${serviceCtlName}>`, 'reset() `state` is `off`, do nothing')
         return
       }
-      
+
       this._serviceCtlResettingIndicator.busy(true)
 
       /**
