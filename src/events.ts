@@ -18,7 +18,7 @@ interface StateSwitchEventListener {
   inactive : InactiveListener
 }
 
-const StateSwitchEventEmitter = EventEmitter as new () => TypedEventEmitter<
+const StateSwitchEventEmitter = EventEmitter as unknown as new () => TypedEventEmitter<
   StateSwitchEventListener
 >
 
