@@ -61,7 +61,7 @@ test('ServiceCtlMixin smoke testing', async t => {
 
   type TestListener = (data: string) => void
 
-  const MyEventEmitter = EventEmitter as new () => TypedEventEmitter<{
+  const MyEventEmitter = EventEmitter as unknown as new () => TypedEventEmitter<{
     test: TestListener
   }>
 
