@@ -7,19 +7,23 @@ import {
 
 import {
   Observable,
-  fromEvent,
+  fromEvent as rxFromEvent,
   firstValueFrom,
-}                 from 'rxjs'
-
+}                             from 'rxjs'
+import type {
+  FromEvent,
+}                             from 'typed-emitter/rxjs'
 import {
   StateSwitch,
   StateSwitchInterface,
 }                         from '../src/mod.js'
-import type { Pending } from '../src/events.js'
+import type { Pending }   from '../src/events.js'
+
+const fromEvent: FromEvent = rxFromEvent
 
 test('RxJS: fromEvent type inference', async t => {
   const state = new StateSwitch()
-  const event$ = fromEvent<true | 'pending'>(state, 'active')
+  const event$ = fromEvent(state, 'active')
   expectType<Observable<true | 'pending'>>(event$)
 
   const future = firstValueFrom(event$)
@@ -34,7 +38,7 @@ test('RxJS: fromEvent type inference', async t => {
 
 test('RxJS: fromEvent stream for the second value', async (t) => {
   const state = new StateSwitch()
-  const event$ = fromEvent<boolean | Pending>(state, 'inactive')
+  const event$ = fromEvent(state, 'inactive')
   state.inactive('pending')
 
   const future = firstValueFrom(event$)
