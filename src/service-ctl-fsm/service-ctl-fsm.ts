@@ -46,8 +46,8 @@ const serviceCtlFsmMixin = (
      */
     state: StateSwitchInterface
 
-    _serviceCtlLogger: Loggable
-    _serviceCtlFsmInterpreter: Interpreter<
+    __serviceCtlLogger: Loggable
+    __serviceCtlFsmInterpreter: Interpreter<
       ServiceCtlContext,
       ServiceCtlState,
       ServiceCtlEvent
@@ -56,8 +56,8 @@ const serviceCtlFsmMixin = (
     constructor (...args: any[]) {
       super(...args)
 
-      this._serviceCtlLogger = getLoggable(options?.log)
-      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'constructor()')
+      this.__serviceCtlLogger = getLoggable(options?.log)
+      this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'constructor()')
 
       this.state = new StateSwitch(serviceCtlName, options)
 
@@ -78,56 +78,56 @@ const serviceCtlFsmMixin = (
       })
       const machine = createMachine(config, machineOptions)
 
-      this._serviceCtlFsmInterpreter = interpret(machine)
-      this._serviceCtlFsmInterpreter.start()
+      this.__serviceCtlFsmInterpreter = interpret(machine)
+      this.__serviceCtlFsmInterpreter.start()
     }
 
     override start (): Promise<void> {
-      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start()')
-      guardMachineEvent(this._serviceCtlFsmInterpreter, 'START')
+      this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start()')
+      guardMachineEvent(this.__serviceCtlFsmInterpreter, 'START')
 
-      const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
-      const canceled  = waitForMachineState(this._serviceCtlFsmInterpreter, 'canceled')
+      const started   = waitForMachineState(this.__serviceCtlFsmInterpreter, 'active')
+      const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
-      this._serviceCtlFsmInterpreter.send('START')
+      this.__serviceCtlFsmInterpreter.send('START')
       this.state.active(true)
 
       return Promise.race([
         started,
         canceled,
       ]).then(() => {
-        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start() ... done')
+        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start() ... done')
         return undefined
       })
     }
 
     override stop (): Promise<void> {
-      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop()')
-      guardMachineEvent(this._serviceCtlFsmInterpreter, 'STOP')
+      this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop()')
+      guardMachineEvent(this.__serviceCtlFsmInterpreter, 'STOP')
 
-      const stopped   = waitForMachineState(this._serviceCtlFsmInterpreter, 'inactive')
-      const canceled  = waitForMachineState(this._serviceCtlFsmInterpreter, 'canceled')
+      const stopped   = waitForMachineState(this.__serviceCtlFsmInterpreter, 'inactive')
+      const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
-      this._serviceCtlFsmInterpreter.send('STOP')
+      this.__serviceCtlFsmInterpreter.send('STOP')
       this.state.inactive(true)
 
       return Promise.race([
         stopped,
         canceled,
       ]).then(() => {
-        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop() ... done')
+        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop() ... done')
         return undefined
       })
     }
 
     reset (): Promise<void> {
-      this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset()')
-      guardMachineEvent(this._serviceCtlFsmInterpreter, 'RESET')
+      this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset()')
+      guardMachineEvent(this.__serviceCtlFsmInterpreter, 'RESET')
 
-      const started   = waitForMachineState(this._serviceCtlFsmInterpreter, 'active')
-      const canceled  = waitForMachineState(this._serviceCtlFsmInterpreter, 'canceled')
+      const started   = waitForMachineState(this.__serviceCtlFsmInterpreter, 'active')
+      const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
-      this._serviceCtlFsmInterpreter.send('RESET')
+      this.__serviceCtlFsmInterpreter.send('RESET')
 
       // TODO: emit('error' e) if there's any rejections inside `reset()`
       //  or the error should be handled by the onStart/onStop ?
@@ -136,7 +136,7 @@ const serviceCtlFsmMixin = (
         started,
         canceled,
       ]).then(() => {
-        this._serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
+        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
         return undefined
       })
     }
