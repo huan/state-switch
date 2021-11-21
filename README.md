@@ -353,9 +353,9 @@ The code is originally from [Wechaty Puppet](https://github.com/wechaty/puppet/b
 
 ## CHANGELOG
 
-### master v1.1 (Oct 27, 2021)
+### master v1.6 (Nov 15, 2021)
 
-Breaking changes:
+#### v1.1 (Oct 27, 2021) - Breaking changes:
 
 1. `StateSwitch#pending` -> `StateSwitch#pending()`
 1. `StateSwitch#on()` -> `StateSwitch#active()`
