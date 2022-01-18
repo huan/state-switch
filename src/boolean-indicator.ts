@@ -1,9 +1,6 @@
 import { StateSwitch }        from './state-switch.js'
 
-/**
- * @deprecated: use `BooleanIndicator` instead
- */
-class BusyIndicator {
+class BooleanIndicator {
 
   private state: StateSwitch
 
@@ -12,16 +9,16 @@ class BusyIndicator {
   }
 
   /**
-   * Set busy state
-   * @param b busy or not
+   * Set boolean state
+   * @param b true or false
    */
-  busy (b: boolean): void
+  value (b: boolean): void
   /**
    * Get busy state
    */
-  busy (): boolean
+  value (): boolean
 
-  busy (b?: boolean): void | boolean {
+  value (b?: boolean): void | boolean {
     if (typeof b === 'undefined') {
       return !!(this.state.active())
     }
@@ -34,12 +31,18 @@ class BusyIndicator {
   }
 
   /**
-   * Return a Promise that resolves when the busy state is off
+   * Return a Promise that resolves when the state is the provided `value`
    */
-  async idle (): Promise<void> {
-    await this.state.stable('inactive')
+  async ready (
+    value: boolean,
+    noCross = false,
+  ): Promise<void> {
+    await this.state.stable(
+      value ? 'active' : 'inactive',
+      noCross,
+    )
   }
 
 }
 
-export { BusyIndicator }
+export { BooleanIndicator }

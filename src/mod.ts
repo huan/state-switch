@@ -11,6 +11,9 @@ import {
   BusyIndicator,
 }                         from './busy-indicator.js'
 import {
+  BooleanIndicator,
+}                         from './boolean-indicator.js'
+import {
   ServiceCtlFsm,
   serviceCtlFsmMixin,
 }                         from './service-ctl-fsm/mod.js'
@@ -26,6 +29,7 @@ export type {
 }
 export {
   BusyIndicator,
+  BooleanIndicator,
   ServiceCtl,
   ServiceCtlFsm,
   serviceCtlFsmMixin,

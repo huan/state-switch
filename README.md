@@ -265,34 +265,34 @@ const log = Brolog.instance()
 StateSwitch.setLog(log)
 ```
 
-## `BusyIndicator`
+## `BooleanIndicator`
 
-Set a busy state.
+Set a true/false state.
 
 ```ts
-const indicator = new BusyIndicator()
+const indicator = new BooleanIndicator()
 ```
 
-### 1. `busy()`
+### 1. `value(v?: boolean): void`
 
-1. set busy or not
-1. get busy status
+1. set `true` or `false`
+1. get `boolean` status
 
 ```ts
-indicator.busy(true)
-indicator.busy(false)
-const busy = indicator.busy()
+indicator.value(true)
+indicator.value(false)
+const value = indicator.value()
 ```
 
-### 2. `idle()`
+### 2. `ready(v: boolean, noCross=false): Promise<void>`
 
-Return a `Promise` that will resolved after the busy state to be idle. (not busy)
+Return a `Promise` that will resolved after the boolean state to be the value passed through `v`.
 
-> If the current state is not busy, it will return a `Promise` that will resolved immediately.
+> If the current boolean state is the same as the `v`, then it will return a `Promise` that will resolved immediately.
 
 ```ts
-await indicator.idle()
-assert (indicator.busy() === false, 'busy() should be false after await idle()')
+await indicator.ready(false)
+assert (indicator.value() === false, 'value() should be false after await ready(false)')
 ```
 
 ## ServiceCtl Interface
@@ -353,9 +353,11 @@ The code is originally from [Wechaty Puppet](https://github.com/wechaty/puppet/b
 
 ## CHANGELOG
 
-### master v1.6 (Nov 15, 2021)
+### master v1.7 (Jan 18, 2022)
 
-#### v1.1 (Oct 27, 2021) - Breaking changes:
+1. Add `BooleanIndicator` class to replace and deprecate the `BusyIndicator` class for a more powerful and easy to use API.
+
+#### v1.1 (Oct 27, 2021) - Breaking changes
 
 1. `StateSwitch#pending` -> `StateSwitch#pending()`
 1. `StateSwitch#on()` -> `StateSwitch#active()`
