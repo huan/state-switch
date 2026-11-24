@@ -1,5 +1,5 @@
 /**
- * @see https://huan.github.io/state-switch/
+ * XState state machine configuration for ServiceCtl lifecycle management.
  */
 import type { MachineConfig } from 'xstate'
 

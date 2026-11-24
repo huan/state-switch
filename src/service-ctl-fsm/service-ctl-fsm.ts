@@ -1,36 +1,37 @@
 /**
- * Licenst: Apache-2.0
- * https://github.com/huan/state-switch
+ * ServiceCtlFsm: Finite State Machine (XState) based service lifecycle controller.
  */
+import { getLoggable }    from 'brolog'
+import type { Loggable }  from 'brolog'
 import {
   createMachine,
   interpret,
-  Interpreter,
-}                       from 'xstate'
-
-import { VERSION }              from '../version.js'
-import {
-  ServiceableAbstract,
-  ServiceCtlInterface,
-  StateSwitchInterface,
-  StateSwitchOptions,
-}                             from '../interfaces.js'
+  type Interpreter,
+}                         from 'xstate'
 
 import type {
-  ServiceCtlContext,
-  ServiceCtlEvent,
-  ServiceCtlState,
-}                     from './machine-config.js'
+  ServiceCtlInterface,
+  StateSwitchOptions,
+  StateSwitchInterface,
+}                               from '../interfaces.ts'
+import { ServiceableAbstract }  from '../interfaces.ts'
+import { StateSwitch }          from '../state-switch.ts'
+import { VERSION }              from '../version.ts'
+
 import {
   config,
-}                     from './machine-config.js'
-
-import { buildMachineOptions }  from './machine-options.js'
-import { waitForMachineState }  from './wait-for-selector.js'
-import { guardMachineEvent }    from './guard-machine-event.js'
-import { getLoggable } from 'brolog'
-import type { Loggable } from 'brolog'
-import { StateSwitch } from '../state-switch.js'
+  type ServiceCtlState,
+  type ServiceCtlEvent,
+}                             from './machine-config.ts'
+import {
+  buildMachineOptions,
+}                             from './machine-options.ts'
+import {
+  guardMachineEvent,
+}                             from './guard-machine-event.ts'
+import {
+  waitForMachineState,
+}                             from './wait-for-selector.ts'
 
 const serviceCtlFsmMixin = (
   serviceCtlName = 'ServiceCtlFsm',
@@ -41,17 +42,10 @@ const serviceCtlFsmMixin = (
 
     static VERSION = VERSION
 
-    /**
-     * Huan(202110): this state is simple record the start/stop status
-     */
     state: StateSwitchInterface
 
     __serviceCtlLogger: Loggable
-    __serviceCtlFsmInterpreter: Interpreter<
-      ServiceCtlContext,
-      ServiceCtlState,
-      ServiceCtlEvent
-    >
+    __serviceCtlFsmInterpreter: Interpreter<any, ServiceCtlState, ServiceCtlEvent>
 
     constructor (...args: any[]) {
       super(...args)
@@ -62,7 +56,6 @@ const serviceCtlFsmMixin = (
       this.state = new StateSwitch(serviceCtlName, options)
 
       const machineOptions = buildMachineOptions({
-        // reset: () => has been internally implemented by calling stop() and start()
         start: async () => {
           if (typeof super.start === 'function') {
             await super.start()
@@ -78,7 +71,7 @@ const serviceCtlFsmMixin = (
       })
       const machine = createMachine(config, machineOptions)
 
-      this.__serviceCtlFsmInterpreter = interpret(machine)
+      this.__serviceCtlFsmInterpreter = interpret(machine) as any
       this.__serviceCtlFsmInterpreter.start()
     }
 
@@ -90,15 +83,7 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
       this.__serviceCtlFsmInterpreter.send('START')
-      this.state.active(true)
-
-      return Promise.race([
-        started,
-        canceled,
-      ]).then(() => {
-        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start() ... done')
-        return undefined
-      })
+      return Promise.race([started, canceled])
     }
 
     override stop (): Promise<void> {
@@ -109,50 +94,30 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
       this.__serviceCtlFsmInterpreter.send('STOP')
-      this.state.inactive(true)
-
-      return Promise.race([
-        stopped,
-        canceled,
-      ]).then(() => {
-        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop() ... done')
-        return undefined
-      })
+      return Promise.race([stopped, canceled])
     }
 
-    reset (): Promise<void> {
+    public reset (): Promise<void> {
       this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset()')
       guardMachineEvent(this.__serviceCtlFsmInterpreter, 'RESET')
 
-      const started   = waitForMachineState(this.__serviceCtlFsmInterpreter, 'active')
+      const reseted   = waitForMachineState(this.__serviceCtlFsmInterpreter, 'active')
       const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
       this.__serviceCtlFsmInterpreter.send('RESET')
-
-      // TODO: emit('error' e) if there's any rejections inside `reset()`
-      //  or the error should be handled by the onStart/onStop ?
-
-      return Promise.race([
-        started,
-        canceled,
-      ]).then(() => {
-        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'reset() ... done')
-        return undefined
-      })
+      return Promise.race([reseted, canceled])
     }
 
-    /**
-     * onStart & onStop must be implemented by the child class
-     */
-    abstract onStart (): Promise<void>
-    abstract onStop  (): Promise<void>
+    abstract onStart (): Promise<void> | void
+    abstract onStop  (): Promise<void> | void
 
   }
 
   return ServiceCtlFsmMixin
 }
 
-abstract class ServiceCtlFsm extends serviceCtlFsmMixin()(ServiceableAbstract) {}
+const ServiceCtlFsm = serviceCtlFsmMixin()(ServiceableAbstract)
+type ServiceCtlFsm = InstanceType<typeof ServiceCtlFsm>
 
 export {
   ServiceCtlFsm,

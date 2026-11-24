@@ -1,3 +1,6 @@
+/**
+ * Event guard ensuring the XState machine can accept a given event in its current state.
+ */
 import type {
   EventObject,
   Interpreter,

@@ -1,8 +1,9 @@
-import { StateSwitch }        from './state-switch.js'
-
 /**
- * @deprecated: use `BooleanIndicator` instead
+ * BusyIndicator: busy/idle state wrapper around StateSwitch.
+ * @deprecated Use BooleanIndicator instead.
  */
+import { StateSwitch }        from './state-switch.ts'
+
 class BusyIndicator {
 
   private state: StateSwitch

@@ -1,26 +1,29 @@
-import { VERSION }  from './version.js'
+/**
+ * Public entry point for state-switch: async state guard and lifecycle control.
+ */
+import { VERSION }  from './version.ts'
 import {
   StateSwitch,
-}                   from './state-switch.js'
+}                   from './state-switch.ts'
 import type {
   BusyIndicatorInterface,
   ServiceCtlInterface,
   StateSwitchInterface,
-}                         from './interfaces.js'
+}                         from './interfaces.ts'
 import {
   BusyIndicator,
-}                         from './busy-indicator.js'
+}                         from './busy-indicator.ts'
 import {
   BooleanIndicator,
-}                         from './boolean-indicator.js'
+}                         from './boolean-indicator.ts'
 import {
   ServiceCtlFsm,
   serviceCtlFsmMixin,
-}                         from './service-ctl-fsm/mod.js'
+}                         from './service-ctl-fsm/mod.ts'
 import {
   ServiceCtl,
   serviceCtlMixin,
-}                         from './service-ctl/mod.js'
+}                         from './service-ctl/mod.ts'
 
 export type {
   BusyIndicatorInterface,
