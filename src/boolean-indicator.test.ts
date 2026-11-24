@@ -25,4 +25,12 @@ test('BooleanIndicator set true', async () => {
   indicator.ready(false).then(spy).catch(assert.fail)
   await new Promise(resolve => setTimeout(resolve, 20))
   assert.equal(callCount, 0, 'should not resolve ready(false) when true')
+
+  indicator.value(true)
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(callCount, 0, 'a repeated value(true) must not drop the ready(false) waiter')
+
+  indicator.value(false)
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(callCount, 1, 'ready(false) resolves once the value is false')
 })

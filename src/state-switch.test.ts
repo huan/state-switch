@@ -129,6 +129,74 @@ test('stable() without default arg for waiting current state', async () => {
   assert.equal(spy.callCount, 1, 'should be stable() for active(true)')
 })
 
+test('pending getters keep the transition direction', () => {
+  const ss = new StateSwitch()
+
+  ss.active('pending')
+  assert.equal(ss.active(), 'pending', 'turning on is pending on the active side')
+  assert.equal(ss.inactive(), false, 'turning on is not pending on the inactive side')
+
+  ss.active(true)
+  ss.inactive('pending')
+  assert.equal(ss.inactive(), 'pending', 'turning off is pending on the inactive side')
+  assert.equal(ss.active(), false, 'turning off is not pending on the active side')
+})
+
+test('stable() reuses the outstanding promise and rearms the opposite side', async () => {
+  const ss = new StateSwitch()
+
+  let activeResolved = false
+  const ready = ss.stable('active').then(() => { activeResolved = true })
+  ss.active('pending')
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.equal(activeResolved, false, 'waiter registered before pending stays pending')
+  ss.active(true)
+  await ready
+
+  let inactiveResolved = false
+  const gone = ss.stable('inactive').then(() => { inactiveResolved = true })
+  ss.active(true)
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.equal(inactiveResolved, false, 'a repeated active(true) must not replace the inactive waiter')
+
+  ss.active('pending')
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.equal(inactiveResolved, false, 'stable(inactive) waits while activation is still pending')
+
+  ss.inactive('pending')
+  let activeAgain = false
+  const back = ss.stable('active').then(() => { activeAgain = true })
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.equal(activeAgain, false, 'stable(active) waits after leaving the stable active state')
+
+  ss.inactive(true)
+  await gone
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.equal(activeAgain, false, 'the rearmed active promise is not the one that already resolved')
+  ss.active(true)
+  await back
+})
+
+test('noCross allows the transition already underway', async () => {
+  const ss = new StateSwitch()
+
+  ss.active('pending')
+  const ready = ss.stable('active', true)
+  await assert.rejects(
+    () => ss.stable('inactive', true),
+    /state is active/,
+    'noCross rejects a wait for the opposite side',
+  )
+  ss.active(true)
+  await ready
+
+  ss.inactive('pending')
+  const stopped = ss.stable('inactive', true)
+  await assert.rejects(() => ss.stable('active', true))
+  ss.inactive(true)
+  await stopped
+})
+
 test('active/inactive events emitting', async () => {
   const spyActive   = createSpy()
   const spyInactive = createSpy()

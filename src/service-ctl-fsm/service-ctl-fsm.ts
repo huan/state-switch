@@ -83,7 +83,11 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
       this.__serviceCtlFsmInterpreter.send('START')
-      return Promise.race([started, canceled])
+      this.state.active(true)
+
+      return Promise.race([started, canceled]).then(() => {
+        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'start() ... done')
+      })
     }
 
     override stop (): Promise<void> {
@@ -94,7 +98,11 @@ const serviceCtlFsmMixin = (
       const canceled  = waitForMachineState(this.__serviceCtlFsmInterpreter, 'canceled')
 
       this.__serviceCtlFsmInterpreter.send('STOP')
-      return Promise.race([stopped, canceled])
+      this.state.inactive(true)
+
+      return Promise.race([stopped, canceled]).then(() => {
+        this.__serviceCtlLogger.verbose(`ServiceCtlFsm<${serviceCtlName}>`, 'stop() ... done')
+      })
     }
 
     public reset (): Promise<void> {

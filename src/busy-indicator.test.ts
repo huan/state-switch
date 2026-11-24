@@ -25,4 +25,12 @@ test('BusyIndicator set busy', async () => {
   indicator.idle().then(spy).catch(assert.fail)
   await new Promise(resolve => setTimeout(resolve, 20))
   assert.equal(callCount, 0, 'should not resolve idle() when busy')
+
+  indicator.busy(true)
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(callCount, 0, 'a repeated busy(true) must not drop the idle() waiter')
+
+  indicator.busy(false)
+  await new Promise(resolve => setTimeout(resolve, 20))
+  assert.equal(callCount, 1, 'idle() resolves once the indicator is idle')
 })

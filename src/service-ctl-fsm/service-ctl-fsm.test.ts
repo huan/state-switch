@@ -24,9 +24,13 @@ test('ServiceCtlFsm smoke testing', async () => {
   await ctl.start()
   assert.equal(onStartCalls, 1, 'should call onStart()')
   assert.equal(onStopCalls, 0, 'should not call onStop()')
+  assert.equal(ctl.state.active(), true, 'public state is active after start()')
+  await assert.doesNotReject(() => ctl.state.stable('active'), 'stable(active) resolves after start()')
 
   await ctl.stop()
   assert.equal(onStopCalls, 1, 'should call onStop()')
+  assert.equal(ctl.state.inactive(), true, 'public state is inactive after stop()')
+  await assert.doesNotReject(() => ctl.state.stable('inactive'), 'stable(inactive) resolves after stop()')
 
   assert.throws(() => ctl.reset(), 'should reject when calling reset() with an inactive service')
 

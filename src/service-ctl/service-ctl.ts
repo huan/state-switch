@@ -54,12 +54,16 @@ const serviceCtlMixin = (
 
       if (this.state.inactive() === 'pending') {
         this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'start() found that is stopping, waiting stable ... (max %s seconds)', TIMEOUT_SECONDS)
-        await timeoutPromise(
-          this.state.stable('inactive'),
-          TIMEOUT_SECONDS * 1000,
-        ).catch(e => {
-          this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'start() timeout: %s', (e as Error).message)
-        })
+        try {
+          await timeoutPromise(
+            this.state.stable('inactive'),
+            TIMEOUT_SECONDS * 1000,
+          )
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'start() found that is stopping, waiting stable ... done')
+        } catch (e) {
+          this.emit('error', e)
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'start() found that is stopping, waiting stable ... timeout')
+        }
       }
 
       this.state.active('pending')
@@ -71,7 +75,11 @@ const serviceCtlMixin = (
         await this.onStart()
       } catch (e) {
         this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'start() exception: %s', (e as Error).message)
+        // Drop the in-flight turn-on before publishing inactive, or a later
+        // stop() treats the controller as already stopped and skips cleanup.
+        const cleanupErrors = await this.__serviceCtlShutdown()
         this.state.inactive(true)
+        this.__serviceCtlEmitErrors([ e, ...cleanupErrors ])
         throw e
       }
 
@@ -90,28 +98,25 @@ const serviceCtlMixin = (
 
       if (this.state.active() === 'pending') {
         this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is starting, waiting stable ... (max %s seconds)', TIMEOUT_SECONDS)
-        await timeoutPromise(
-          this.state.stable('active'),
-          TIMEOUT_SECONDS * 1000,
-        ).catch(e => {
-          this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'stop() timeout: %s', (e as Error).message)
-        })
+        try {
+          await timeoutPromise(
+            this.state.stable('active'),
+            TIMEOUT_SECONDS * 1000,
+          )
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is starting, waiting stable ... done')
+        } catch (e) {
+          this.emit('error', e)
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'stop() found that is starting, waiting stable ... timeout')
+        }
       }
 
       this.state.inactive('pending')
 
-      try {
-        await this.onStop()
-        if (typeof super.stop === 'function') {
-          await super.stop()
-        }
-      } catch (e) {
-        this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'stop() exception: %s', (e as Error).message)
-        this.state.active(true)
-        throw e
-      }
-
+      const cleanupErrors = await this.__serviceCtlShutdown()
+      // A failed child hook must not put the controller back to active, and
+      // must not skip the parent. The service is stopped either way.
       this.state.inactive(true)
+      this.__serviceCtlEmitErrors(cleanupErrors)
     }
 
     public async reset () : Promise<void> {
@@ -119,26 +124,74 @@ const serviceCtlMixin = (
 
       if (this.__serviceCtlResettingIndicator.busy()) {
         this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'reset() found that is resetting, waiting idle ... (max %s seconds)', RESET_TIMEOUT_SECONDS)
-        await timeoutPromise(
-          this.__serviceCtlResettingIndicator.idle(),
-          RESET_TIMEOUT_SECONDS * 1000,
-        ).catch(e => {
+        try {
+          await timeoutPromise(
+            this.__serviceCtlResettingIndicator.idle(),
+            RESET_TIMEOUT_SECONDS * 1000,
+          )
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'reset() found that is resetting, waiting idle ... done')
+        } catch (e) {
           this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'reset() timeout: %s', (e as Error).message)
-        })
+          this.emit('error', e)
+          throw e
+        }
+        return
+      }
+
+      if (this.state.inactive()) {
+        this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'reset() found that is NOT active, doing nothing')
         return
       }
 
       this.__serviceCtlResettingIndicator.busy(true)
 
       try {
-        if (this.state.active()) {
-          await this.stop()
-          await this.start()
-        } else {
-          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'reset() found that is NOT active, doing nothing')
+        try {
+          await timeoutPromise(
+            this.state.stable(),
+            3 * TIMEOUT_SECONDS * 1000,
+          )
+        } catch (e) {
+          this.emit('error', e)
+          this.__serviceCtlLogger.warn(`ServiceCtl<${serviceCtlName}>`, 'reset() wait stable timeout: %s', (e as Error).message)
         }
+
+        await this.stop()
+        await this.start()
       } finally {
         this.__serviceCtlResettingIndicator.busy(false)
+      }
+    }
+
+    /**
+     * Child hook first, then the parent. Each failure is recorded and does not
+     * cancel the other hook.
+     */
+    async __serviceCtlShutdown (): Promise<unknown[]> {
+      const errors: unknown[] = []
+
+      try {
+        await this.onStop()
+      } catch (e) {
+        this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'stop() onStop() exception: %s', (e as Error).message)
+        errors.push(e)
+      }
+
+      if (typeof super.stop === 'function') {
+        try {
+          await super.stop()
+        } catch (e) {
+          this.__serviceCtlLogger.error(`ServiceCtl<${serviceCtlName}>`, 'stop() super.stop() exception: %s', (e as Error).message)
+          errors.push(e)
+        }
+      }
+
+      return errors
+    }
+
+    __serviceCtlEmitErrors (errors: readonly unknown[]): void {
+      for (const e of errors) {
+        this.emit('error', e)
       }
     }
 

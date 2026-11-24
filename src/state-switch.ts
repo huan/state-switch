@@ -1,6 +1,12 @@
 /**
  * StateSwitch: change monitor and guarder for asynchronous state transitions.
  * Supports Three-Valued Logic (3VL): true, false, and 'pending'.
+ *
+ * `active('pending')` means a turn-on is in flight (`active()` is `'pending'`,
+ * `inactive()` is `false`). `inactive('pending')` is the opposite. Readiness
+ * promises are armed once and reused until they settle, so `stable()` waiters
+ * survive a later pending/true pair and the opposite promise is rearmed when
+ * its stable state is left.
  */
 import type { Loggable } from 'brolog'
 import { getLoggable }  from 'brolog'
@@ -60,8 +66,12 @@ export class StateSwitch extends StateSwitchEventEmitter implements StateSwitchI
     this._activeResolver    = nop
     this._inactiveResolver  = nop
 
-    this._activePromise   = this.initPromise('active')
-    this._inactivePromise = this.initPromise('inactive')
+    // Inactive is the initial stable state. The active promise stays pending
+    // until the first successful turn-on.
+    this._activePromise = new Promise<void>(resolve => {
+      this._activeResolver = resolve
+    })
+    this._inactivePromise = Promise.resolve()
   }
 
   public version (): string {
@@ -72,97 +82,100 @@ export class StateSwitch extends StateSwitchEventEmitter implements StateSwitchI
     return this._name
   }
 
-  private initPromise (type: StateType): Promise<void> {
-    this._log.verbose('StateSwitch', 'initPromise(%s)', type)
-
-    const isTargetActive = type === 'active'
-
-    if (this._isActive === isTargetActive && !this._isPending) {
-      this._log.verbose('StateSwitch', 'initPromise(%s) resolved because this._isActive === %s and not pending',
-        type,
-        this._isActive,
-      )
-      return Promise.resolve()
+  /**
+   * Open a fresh readiness promise only when the previous one has settled.
+   * Replacing an outstanding resolver would leave existing `stable()` waiters
+   * pending forever.
+   */
+  private arm (which: StateType): void {
+    if (which === 'active') {
+      if (!isNop(this._activeResolver)) {
+        return
+      }
+      this._activePromise = new Promise<void>(resolve => {
+        this._activeResolver = resolve
+      })
+      return
     }
 
-    return new Promise<void>(resolve => {
-      this._log.verbose('StateSwitch', 'initPromise(%s) new Promise()', type)
-      if (isTargetActive) {
-        this._activeResolver = resolve
-      } else {
-        this._inactiveResolver = resolve
-      }
+    if (!isNop(this._inactiveResolver)) {
+      return
+    }
+    this._inactivePromise = new Promise<void>(resolve => {
+      this._inactiveResolver = resolve
     })
+  }
+
+  private settle (which: StateType): void {
+    if (which === 'active') {
+      if (isNop(this._activeResolver)) {
+        return
+      }
+      this._log.verbose('StateSwitch', 'active(true) resolving activeResolver')
+      this._activeResolver()
+      this._activeResolver = nop
+      return
+    }
+
+    if (isNop(this._inactiveResolver)) {
+      return
+    }
+    this._log.verbose('StateSwitch', 'inactive(true) resolving inactiveResolver')
+    this._inactiveResolver()
+    this._inactiveResolver = nop
   }
 
   public active (): boolean | Pending
   public active (state: true | Pending): void
 
   public active (state?: true | Pending): void | boolean | Pending {
+    /**
+     * Get. `'pending'` only while turning on; the opposite side stays `false`.
+     */
     if (typeof state === 'undefined') {
-      return this._isPending
-        ? 'pending'
-        : this._isActive
+      return this._isActive
+        ? this._isPending ? 'pending' : true
+        : false
     }
 
     this._log.verbose('StateSwitch', 'active(%s)', state)
 
-    if (state === 'pending') {
-      this._isPending = true
-      this._isActive  = false
-      this._activePromise = this.initPromise('active')
-
-      this.emit('active', 'pending')
-      return
-    }
-
-    this._isPending = false
     this._isActive  = true
+    this._isPending = state === 'pending'
 
-    if (!isNop(this._activeResolver)) {
-      this._log.verbose('StateSwitch', 'active(true) resolving activeResolver')
-      this._activeResolver()
-      this._activeResolver = nop
+    // Leave the stable inactive state before listeners observe the transition.
+    this.arm('inactive')
+    this.emit('active', state)
+
+    if (state === true) {
+      this.settle('active')
     }
-
-    this._inactivePromise = this.initPromise('inactive')
-
-    this.emit('active', true)
   }
 
   public inactive (): boolean | Pending
   public inactive (state: true | Pending): void
 
   public inactive (state?: true | Pending): void | boolean | Pending {
+    /**
+     * Get. `'pending'` only while turning off; the opposite side stays `false`.
+     */
     if (typeof state === 'undefined') {
-      return this._isPending
-        ? 'pending'
-        : !this._isActive
+      return !this._isActive
+        ? this._isPending ? 'pending' : true
+        : false
     }
 
     this._log.verbose('StateSwitch', 'inactive(%s)', state)
 
-    if (state === 'pending') {
-      this._isPending = true
-      this._isActive  = true
-      this._inactivePromise = this.initPromise('inactive')
-
-      this.emit('inactive', 'pending')
-      return
-    }
-
-    this._isPending = false
     this._isActive  = false
+    this._isPending = state === 'pending'
 
-    if (!isNop(this._inactiveResolver)) {
-      this._log.verbose('StateSwitch', 'inactive(true) resolving inactiveResolver')
-      this._inactiveResolver()
-      this._inactiveResolver = nop
+    this.arm('active')
+    this.emit('inactive', state)
+
+    if (state === true) {
+      this.settle('inactive')
     }
-
-    this._activePromise = this.initPromise('active')
-
-    this.emit('inactive', true)
   }
 
   public pending (): boolean {
@@ -176,32 +189,28 @@ export class StateSwitch extends StateSwitchEventEmitter implements StateSwitchI
     this._log.verbose('StateSwitch', 'stable(%s, %s)', expectedState, noCross)
 
     if (!expectedState) {
-      if (this._isPending) {
-        expectedState = this._isActive ? 'inactive' : 'active'
-      } else {
-        expectedState = this._isActive ? 'active'   : 'inactive'
-      }
-    }
-
-    if (noCross) {
-      if (this.pending()) {
-        throw new Error('StateSwitch.stable() failed because noCross is true and state is pending')
-      }
-      if (expectedState === 'active' && !this._isActive) {
-        throw new Error('StateSwitch.stable() failed because noCross is true and expectedState is active but state is inactive')
-      }
-      if (expectedState === 'inactive' && this._isActive) {
-        throw new Error('StateSwitch.stable() failed because noCross is true and expectedState is inactive but state is active')
-      }
+      // `_isActive` is the transition target while pending, and the stable
+      // side otherwise, so the default follows the direction already in flight.
+      expectedState = this._isActive ? 'active' : 'inactive'
     }
 
     if (expectedState === 'active') {
+      if (noCross && this._isActive === false) {
+        throw new Error('stable(active) but the state is inactive. call stable(active, false) to disable noCross')
+      }
       await this._activePromise
-    } else if (expectedState === 'inactive') {
-      await this._inactivePromise
-    } else {
-      throw new Error('unsupported expectedState: ' + expectedState)
+      return
     }
+
+    if (expectedState === 'inactive') {
+      if (noCross && this._isActive === true) {
+        throw new Error('stable(inactive) but the state is active. call stable(inactive, false) to disable noCross')
+      }
+      await this._inactivePromise
+      return
+    }
+
+    throw new Error('unsupported expectedState: ' + expectedState)
   }
 
 }
