@@ -1,7 +1,10 @@
+/**
+ * ServiceCtl module entry point.
+ */
 import {
   ServiceCtl,
   serviceCtlMixin,
-}                     from './service-ctl.js'
+}                     from './service-ctl.ts'
 
 export {
   ServiceCtl,

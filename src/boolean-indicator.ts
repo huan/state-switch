@@ -1,4 +1,7 @@
-import { StateSwitch }        from './state-switch.js'
+/**
+ * BooleanIndicator: binary state wrapper around StateSwitch with ready() synchronization.
+ */
+import { StateSwitch }        from './state-switch.ts'
 
 class BooleanIndicator {
 

@@ -1,17 +1,14 @@
+/**
+ * Utility to asynchronously wait for a specific XState machine state transition using RxJS.
+ */
 import {
-  Observable,
+  type Observable,
   firstValueFrom,
   from,
 }                 from 'rxjs'
 import {
   filter,
-  // eslint-disable-next-line import/extensions
 }                 from 'rxjs/operators'
-import type {
-  State,
-  Interpreter,
-  StateSchema,
-}                 from 'xstate'
 
 const waitForSelector = async <T> (
   stream$: Observable<T>,
@@ -25,16 +22,12 @@ const waitForSelector = async <T> (
   return future.then(() => undefined)
 }
 
-const waitForMachineState = async <TServiceCtlState extends StateSchema> (
-  interpreter: Interpreter<
-    any,
-    TServiceCtlState,
-    any
->,
-  state: keyof TServiceCtlState['states'],
+const waitForMachineState = async (
+  interpreter: any,
+  state: string,
 ): Promise<void> => {
   const selector = (
-    x: State<any, any, TServiceCtlState>,
+    x: any,
   ) => x.value === state
 
   return waitForSelector(

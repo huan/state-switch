@@ -1,9 +1,12 @@
+/**
+ * Build XState machine options (actions, activities, services) for ServiceCtlFsm.
+ */
 import type { MachineOptions } from 'xstate'
 
 import type {
   ServiceCtlContext,
   ServiceCtlEvent,
-}                     from './machine-config.js'
+}                     from './machine-config.ts'
 
 interface ServiceCtlServiceOptions {
   // actions: {

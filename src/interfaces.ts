@@ -1,8 +1,11 @@
+/**
+ * Interface contracts for StateSwitch, BusyIndicator, and ServiceCtl.
+ */
 import type { Loggable } from 'brolog'
 
-import type { StateSwitch }   from './state-switch.js'
-import type { BusyIndicator } from './busy-indicator.js'
-import type { ServiceCtl }    from './service-ctl/service-ctl.js'
+import type { StateSwitch }   from './state-switch.ts'
+import type { BusyIndicator } from './busy-indicator.ts'
+import type { ServiceCtl }    from './service-ctl/service-ctl.ts'
 
 interface StateSwitchInterface {
   active   : StateSwitch['active']
@@ -44,8 +47,8 @@ abstract class ServiceableAbstract {
 
 export type {
   BusyIndicatorInterface,
-  StateSwitchInterface,
   ServiceCtlInterface,
+  StateSwitchInterface,
   StateSwitchOptions,
 }
 export {

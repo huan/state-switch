@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
-set -e
+#
+# Sets publishConfig.tag from the package version before `npm publish`.
+# A production release (no prerelease) is tagged "latest"; anything else is "next".
+# Production installs (`npm install state-switch`) follow "latest".
+#
+set -euo pipefail
 
-VERSION=$(npx pkg-jq -r .version)
+node <<'JS'
+const fs = require('fs')
 
-if npx --package @chatie/semver semver-is-prod $VERSION; then
-  npx pkg-jq -i '.publishConfig.tag="latest"'
-  echo "production release: publicConfig.tag set to latest."
-else
-  npx pkg-jq -i '.publishConfig.tag="next"'
-  echo 'development release: publicConfig.tag set to next.'
-fi
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
+const version = pkg.version
+const match = /^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+[0-9A-Za-z.-]+)?$/.exec(version)
 
+if (!match) {
+  console.error(`unsupported version: ${version}`)
+  process.exit(1)
+}
+
+const tag = match[4] ? 'next' : 'latest'
+pkg.publishConfig = { ...pkg.publishConfig, tag }
+fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n')
+console.log(`publishConfig.tag set to ${tag} for version ${version}.`)
+JS
