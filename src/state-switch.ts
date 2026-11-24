@@ -11,11 +11,6 @@
 import type { Loggable } from 'brolog'
 import { getLoggable }  from 'brolog'
 import {
-  nop,
-  isNop,
-}                       from '@pipeletteio/nop'
-
-import {
   VERSION,
 }                           from './version.js'
 import type {
@@ -27,6 +22,9 @@ import {
   Pending,
   StateType,
 }                           from './events.js'
+
+const nop = (..._args: unknown[]): void => {}
+const isNop = (arg: unknown): boolean => arg === nop
 
 let COUNTER = 0
 
